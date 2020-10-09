@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "format": "DIN A4",
+    "marginleft": 25,
+    "marginright": 25,
+    "margintop": 25,
+    "marginbottom": 25
+  },
+  "parameters": [],
+  "content": [
+    {
+      "id": "aba080c8-84a8-4056-af6b-f72f5e5e2937",
+      "label": "Table",
+      "type": "table",
+      "mapping": "",
+      "maxrows": -1,
+      "cols": [
+        {
+          "value": "$crmcliente_1.aziendanome",
+          "headervalue": "Azienda"
+        },
+        {
+          "headervalue": "Fatturato",
+          "value": "$crmcliente_1.fatturato"
+        }
+      ],
+      "conditions": [
+        {
+          "attribute": "fatturato",
+          "operator": ">",
+          "value": "5000",
+          "gate": ""
+        }
+      ],
+      "querysource": "crmcliente"
+    }
+  ],
+  "header": {
+    "rows": [
+      {
+        "cols": [
+          {
+            "value": "Continental",
+            "align": "left",
+            "fontfamily": "Courier New",
+            "fontsize": "15px",
+            "color": "#fe9200",
+            "background": "#000000"
+          }
+        ]
+      },
+      {
+        "cols": [
+          {
+            "value": "Business Report Q1 2020",
+            "align": "left"
+          },
+          {
+            "value": "Product: A3",
+            "align": "right"
+          }
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "rows": [
+      {
+        "cols": [
+          {
+            "value": "Copyright 2020 - Continental AG",
+            "align": "center",
+            "fontfamily": "Georgia",
+            "fontsize": "15px",
+            "underline": true
+          }
+        ]
+      },
+      {
+        "cols": [
+          {
+            "value": "Page: #currentpage / #totalpages",
+            "align": "center",
+            "fontfamily": "Arial",
+            "fontsize": "15px"
+          }
+        ]
+      }
+    ]
+  }
+}
