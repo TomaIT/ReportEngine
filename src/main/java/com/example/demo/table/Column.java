@@ -8,6 +8,5 @@ import lombok.Data;
 public class Column {
 	private String name;
 	private float width;
-
 }
 
