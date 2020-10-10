@@ -44,13 +44,17 @@ public class PDFTableGenerator {
 		// Position cursor to start drawing content
 		float nextTextX = table.getMargin() + table.getCellMargin();
 		// Calculate center alignment for text in cell considering font height
-		float nextTextY = tableTopY - (table.getRowHeight() / 2)
-				- ((table.getTextFont().getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * table.getFontSize()) / 4);
+		float nextTextY = (float) (tableTopY - (table.getRowHeight() / 2.0)
+						- ((table.getTextFontHeader().getFontDescriptor().getFontBoundingBox().getHeight() * table.getFontSizeHeader() / 1000.0 ) / 4.0));
 
 		// Write column headers
 		writeContentLine(table.getHeaders(), contentStream, nextTextX, nextTextY, table);
-		nextTextY -= table.getRowHeight();
+		//nextTextY -= table.getRowHeight();
 		nextTextX = table.getMargin() + table.getCellMargin();
+
+		contentStream.setFont(table.getTextFontContent(), table.getFontSizeContent());
+		nextTextY = (float) (tableTopY - (table.getRowHeight() / 2.0) - table.getRowHeight()
+						- ((table.getTextFontContent().getFontDescriptor().getFontBoundingBox().getHeight() * table.getFontSizeContent() / 1000.0 ) / 4.0));
 
 		// Write content
 		for (String[] strings : currentPageContent) {
@@ -130,7 +134,7 @@ public class PDFTableGenerator {
 		if (table.isLandscape()) {
 			contentStream.transform(new Matrix(0, 1, -1, 0, table.getPageSize().getWidth(), 0));
 		}
-		contentStream.setFont(table.getTextFont(), table.getFontSize());
+		contentStream.setFont(table.getTextFontHeader(), table.getFontSizeHeader());
 		return contentStream;
 	}
 }
