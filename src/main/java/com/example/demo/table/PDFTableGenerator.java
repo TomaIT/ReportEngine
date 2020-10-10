@@ -3,6 +3,7 @@ package com.example.demo.table;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.util.Matrix;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -20,8 +21,8 @@ public class PDFTableGenerator {
 	// Configures basic setup for the table and draws it page by page
 	public void drawTable(PDDocument doc, Table table) throws IOException {
 		// Calculate pagination
-		Integer rowsPerPage = (int)Math.floor(table.getHeight() / table.getRowHeight()) - 1; // subtract
-		Integer numberOfPages = (int)Math.ceil(table.getNumberOfRows().floatValue() / rowsPerPage);
+		int rowsPerPage = (int)Math.floor(table.getHeight() / table.getRowHeight()) - 1; // subtract
+		int numberOfPages = (int)Math.ceil(table.getNumberOfRows().floatValue() / rowsPerPage);
 
 		// Generate each page, get the content and draw it
 		for (int pageCount = 0; pageCount < numberOfPages; pageCount++) {
@@ -47,13 +48,13 @@ public class PDFTableGenerator {
 				- ((table.getTextFont().getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * table.getFontSize()) / 4);
 
 		// Write column headers
-		writeContentLine(table.getColumnsNamesAsArray(), contentStream, nextTextX, nextTextY, table);
+		writeContentLine(table.getHeaders(), contentStream, nextTextX, nextTextY, table);
 		nextTextY -= table.getRowHeight();
 		nextTextX = table.getMargin() + table.getCellMargin();
 
 		// Write content
-		for (int i = 0; i < currentPageContent.length; i++) {
-			writeContentLine(currentPageContent[i], contentStream, nextTextX, nextTextY, table);
+		for (String[] strings : currentPageContent) {
+			writeContentLine(strings, contentStream, nextTextX, nextTextY, table);
 			nextTextY -= table.getRowHeight();
 			nextTextX = table.getMargin() + table.getCellMargin();
 		}
@@ -67,10 +68,10 @@ public class PDFTableGenerator {
 		for (int i = 0; i < table.getNumberOfColumns(); i++) {
 			String text = lineContent[i];
 			contentStream.beginText();
-			contentStream.moveTextPositionByAmount(nextTextX, nextTextY);
-			contentStream.drawString(text != null ? text : "");
+			contentStream.newLineAtOffset(nextTextX, nextTextY);
+			contentStream.showText(text != null ? text : "");
 			contentStream.endText();
-			nextTextX += table.getColumns().get(i).getWidth();
+			nextTextX += table.getColumnWidth(i);
 		}
 	}
 
@@ -78,8 +79,13 @@ public class PDFTableGenerator {
 			throws IOException {
 		// Draw row lines
 		float nextY = tableTopY;
+		contentStream.setLineWidth(table.getLineSize());
 		for (int i = 0; i <= currentPageContent.length + 1; i++) {
-			contentStream.drawLine(table.getMargin(), nextY, table.getMargin() + table.getWidth(), nextY);
+			//Use moveto(xStart,yStart) followed by lineTo(xEnd,yEnd) followed by stroke().
+			contentStream.moveTo(table.getMargin(),nextY);
+			contentStream.lineTo(table.getMargin() + table.getWidth(),nextY);
+			contentStream.stroke();
+			//contentStream.drawLine(table.getMargin(), nextY, table.getMargin() + table.getWidth(), nextY);
 			nextY -= table.getRowHeight();
 		}
 
@@ -88,10 +94,16 @@ public class PDFTableGenerator {
 		final float tableBottomY = tableTopY - tableYLength;
 		float nextX = table.getMargin();
 		for (int i = 0; i < table.getNumberOfColumns(); i++) {
-			contentStream.drawLine(nextX, tableTopY, nextX, tableBottomY);
-			nextX += table.getColumns().get(i).getWidth();
+			//contentStream.drawLine(nextX, tableTopY, nextX, tableBottomY);
+			contentStream.moveTo(nextX,tableTopY);
+			contentStream.lineTo(nextX,tableBottomY);
+			contentStream.stroke();
+			nextX += table.getColumnWidth(i);
 		}
-		contentStream.drawLine(nextX, tableTopY, nextX, tableBottomY);
+		//contentStream.drawLine(nextX, tableTopY, nextX, tableBottomY);
+		contentStream.moveTo(nextX,tableTopY);
+		contentStream.lineTo(nextX,tableBottomY);
+		contentStream.stroke();
 	}
 
 	private String[][] getContentForCurrentPage(Table table, Integer rowsPerPage, int pageCount) {
@@ -112,11 +124,11 @@ public class PDFTableGenerator {
 	}
 
 	private PDPageContentStream generateContentStream(PDDocument doc, PDPage page, Table table) throws IOException {
-		PDPageContentStream contentStream = new PDPageContentStream(doc, page, false, false);
+		PDPageContentStream contentStream = new PDPageContentStream(doc, page, PDPageContentStream.AppendMode.OVERWRITE, false);
 		// User transformation matrix to change the reference when drawing.
 		// This is necessary for the landscape position to draw correctly
 		if (table.isLandscape()) {
-			contentStream.concatenate2CTM(0, 1, -1, 0, table.getPageSize().getWidth(), 0);
+			contentStream.transform(new Matrix(0, 1, -1, 0, table.getPageSize().getWidth(), 0));
 		}
 		contentStream.setFont(table.getTextFont(), table.getFontSize());
 		return contentStream;

@@ -36,11 +36,11 @@ public class DemoApplication  implements CommandLineRunner {
     // Page configuration
     private static final PDRectangle PAGE_SIZE = PDRectangle.A4;
     private static final float MARGIN = 20;
-    private static final boolean IS_LANDSCAPE = true;
+    private static final boolean IS_LANDSCAPE = false;
 
     // Font configuration
     private static final PDFont TEXT_FONT = PDType1Font.HELVETICA;
-    private static final float FONT_SIZE = 10;
+    private static final float FONT_SIZE = 12;
 
     // Table configuration
     private static final float ROW_HEIGHT = 15;
@@ -217,37 +217,26 @@ public class DemoApplication  implements CommandLineRunner {
                 { "FirstName", "LastName", "fakemail@mock.com", "12345", "yes", "XH4234FSD", "4334", "yFone 5 XS", "31/05/2013 07:15 am", "WEB" }
         };
 
+        String[] headers = {"FirstName","LastName","Email","ZipCode","MailOptIn","Code","Branch","Product","Date","Channel"};
 
-        // Total size of columns must not be greater than table width.
-        List<Column> columns = new ArrayList<Column>();
-        columns.add(new Column("FirstName", getMaxWidth("FirstName",content,0)));
-        columns.add(new Column("LastName",  getMaxWidth("LastName",content,1)));
-        columns.add(new Column("Email",     getMaxWidth("Email",content,2)));
-        columns.add(new Column("ZipCode",   getMaxWidth("ZipCode",content,3)));
-        columns.add(new Column("MailOptIn", getMaxWidth("MailOptIn",content,4)));
-        columns.add(new Column("Code",      getMaxWidth("Code",content,5)));
-        columns.add(new Column("Branch",    getMaxWidth("Branch",content,6)));
-        columns.add(new Column("Product",   getMaxWidth("Product",content,7)));
-        columns.add(new Column("Date",      getMaxWidth("Date",content,8)));
-        columns.add(new Column("Channel",   getMaxWidth("Channel",content,9)));
 
 
 
         float tableHeight = IS_LANDSCAPE ? PAGE_SIZE.getWidth() - (2 * MARGIN) : PAGE_SIZE.getHeight() - (2 * MARGIN);
 
-        return Table.builder()
+        Table table = Table.builder()
                 .cellMargin(CELL_MARGIN)
-                .columns(columns)
+                .headers(headers)
                 .content(content)
-                .height(tableHeight)
-                .numberOfRows(content.length)
-                .rowHeight(ROW_HEIGHT)
                 .margin(MARGIN)
                 .pageSize(PAGE_SIZE)
                 .isLandscape(IS_LANDSCAPE)
                 .textFont(TEXT_FONT)
                 .fontSize(FONT_SIZE)
                 .build();
+        System.out.println(table.isBeautiful());
+        System.out.println(table.tryToBeauty(1000));
+        return table;
     }
 
     @Override
@@ -256,12 +245,14 @@ public class DemoApplication  implements CommandLineRunner {
                 new File("./src/main/resources/report.json"),
                 Report.class);
 
-        testPdfBox();
-        System.out.println("PDF-DONE");
-        testHtml();
-        System.out.println("HTML-DONE");
+        //testPdfBox();
+        //System.out.println("PDF-DONE");
+        //testHtml();
+        //System.out.println("HTML-DONE");
 
-        new PDFTableGenerator().generatePDF(createContent(),"src/main/resources/tablePdfBox_"+System.currentTimeMillis()+".pdf");
+        new PDFTableGenerator().generatePDF(createContent(),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
 
+
+        System.out.println("DONE");
     }
 }
