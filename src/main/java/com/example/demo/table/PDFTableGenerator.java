@@ -19,7 +19,7 @@ public class PDFTableGenerator {
 	}
 
 	// Configures basic setup for the table and draws it page by page
-	public void drawTable(PDDocument doc, Table table) throws IOException {
+	public static void drawTable(PDDocument doc, Table table) throws IOException {
 		// Calculate pagination
 		int rowsPerPage = (int)Math.floor(table.getHeight() / table.getRowHeight()) - 1; // subtract
 		int numberOfPages = (int)Math.ceil(table.getNumberOfRows().floatValue() / rowsPerPage);
@@ -34,7 +34,7 @@ public class PDFTableGenerator {
 	}
 
 	// Draws current page table grid and border lines and content
-	private void drawCurrentPage(Table table, String[][] currentPageContent, PDPageContentStream contentStream)
+	private static void drawCurrentPage(Table table, String[][] currentPageContent, PDPageContentStream contentStream)
 			throws IOException {
 		float tableTopY = table.isLandscape() ? table.getPageSize().getWidth() - table.getMargin() : table.getPageSize().getHeight() - table.getMargin();
 
@@ -67,7 +67,7 @@ public class PDFTableGenerator {
 	}
 
 	// Writes the content for one line
-	private void writeContentLine(String[] lineContent, PDPageContentStream contentStream, float nextTextX, float nextTextY,
+	private static void writeContentLine(String[] lineContent, PDPageContentStream contentStream, float nextTextX, float nextTextY,
 								  Table table) throws IOException {
 		for (int i = 0; i < table.getNumberOfColumns(); i++) {
 			String text = lineContent[i];
@@ -79,7 +79,7 @@ public class PDFTableGenerator {
 		}
 	}
 
-	private void drawTableGrid(Table table, String[][] currentPageContent, PDPageContentStream contentStream, float tableTopY)
+	private static void drawTableGrid(Table table, String[][] currentPageContent, PDPageContentStream contentStream, float tableTopY)
 			throws IOException {
 		// Draw row lines
 		float nextY = tableTopY;
@@ -110,7 +110,7 @@ public class PDFTableGenerator {
 		contentStream.stroke();
 	}
 
-	private String[][] getContentForCurrentPage(Table table, Integer rowsPerPage, int pageCount) {
+	private static String[][] getContentForCurrentPage(Table table, Integer rowsPerPage, int pageCount) {
 		int startRange = pageCount * rowsPerPage;
 		int endRange = (pageCount * rowsPerPage) + rowsPerPage;
 		if (endRange > table.getNumberOfRows()) {
@@ -119,7 +119,7 @@ public class PDFTableGenerator {
 		return Arrays.copyOfRange(table.getContent(), startRange, endRange);
 	}
 
-	private PDPage generatePage(PDDocument doc, Table table) {
+	private static PDPage generatePage(PDDocument doc, Table table) {
 		PDPage page = new PDPage();
 		page.setMediaBox(table.getPageSize());
 		page.setRotation(table.isLandscape() ? 90 : 0);
@@ -127,7 +127,7 @@ public class PDFTableGenerator {
 		return page;
 	}
 
-	private PDPageContentStream generateContentStream(PDDocument doc, PDPage page, Table table) throws IOException {
+	private static PDPageContentStream generateContentStream(PDDocument doc, PDPage page, Table table) throws IOException {
 		PDPageContentStream contentStream = new PDPageContentStream(doc, page, PDPageContentStream.AppendMode.OVERWRITE, false);
 		// User transformation matrix to change the reference when drawing.
 		// This is necessary for the landscape position to draw correctly

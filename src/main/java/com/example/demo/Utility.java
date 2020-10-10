@@ -20,6 +20,6 @@ public class Utility {
         counter.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .limit(10)
-                .forEach(System.out::println);
+                .forEach(x->System.out.println(x.getKey()+" = "+x.getValue()+"ms"));
     }
 }

@@ -130,11 +130,11 @@ public class DemoApplication  implements CommandLineRunner {
         //testHtml();
         //System.out.println("HTML-DONE");
 
-        Utility.startTimer("TOTAL");
-        new PDFTableGenerator().generatePDF(createContent(1000,10,5),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
-        Utility.stopTimer("TOTAL");
+        //Utility.startTimer("TOTAL");
+        //new PDFTableGenerator().generatePDF(createContent(50000,25,12),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
+        //Utility.stopTimer("TOTAL");
 
-        Utility.printTimers();
+        //Utility.printTimers();
         System.out.println("DONE");
     }
 }
