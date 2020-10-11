@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.reportengine.Component;
 import com.example.demo.table.PDFTableGenerator;
 import com.example.demo.table.Table;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -11,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class DemoApplicationTests {
@@ -61,6 +65,25 @@ class DemoApplicationTests {
         }
         Utility.stopTimer("(Rows: "+nRows+", nCols: "+nCols+", nChars: "+nChars+")");
         Utility.printTimers();
+    }
+
+    @Test
+    void testOverlapComponents() throws IOException {
+        Component a = new Component(new PDRectangle(0,0,2,2));
+        Component b = new Component(new PDRectangle(1,1,2,2));
+        Component c = new Component(new PDRectangle(2,2,2,2));
+        Component d = new Component(new PDRectangle(0,0,1,1));
+
+        assertTrue(a.isOverlapped(b));assertTrue(b.isOverlapped(a));
+
+        assertFalse(a.isOverlapped(c));assertFalse(c.isOverlapped(a));
+
+        assertTrue(b.isOverlapped(c));assertTrue(c.isOverlapped(b));
+
+        assertTrue(a.isOverlapped(d));assertTrue(d.isOverlapped(a));
+        assertFalse(b.isOverlapped(d));assertFalse(d.isOverlapped(b));
+        assertFalse(c.isOverlapped(d));assertFalse(d.isOverlapped(c));
+
     }
 
 }
