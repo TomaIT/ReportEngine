@@ -1,5 +1,10 @@
 package com.example.demo;
 
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+
+import java.awt.*;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,5 +26,16 @@ public class Utility {
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .limit(10)
                 .forEach(x->System.out.println(x.getKey()+" = "+x.getValue()+"ms"));
+    }
+
+    public static void drawRect(PDPageContentStream content, Color color, PDRectangle rect, boolean fill) throws IOException {
+        content.addRect(rect.getLowerLeftX(), rect.getLowerLeftY(), rect.getWidth(), rect.getHeight());
+        if (fill) {
+            content.setNonStrokingColor(color);
+            content.fill();
+        } else {
+            content.setStrokingColor(color);
+            content.stroke();
+        }
     }
 }

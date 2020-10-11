@@ -1,8 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.model.Report;
-import com.example.demo.table.Column;
-import com.example.demo.table.PDFTableGenerator;
+import com.example.demo.reportengine.Report;
 import com.example.demo.table.Table;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -21,6 +19,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.List;
 
 @SpringBootApplication
 public class DemoApplication  implements CommandLineRunner {
@@ -97,9 +97,11 @@ public class DemoApplication  implements CommandLineRunner {
     private static Table createContent(int nRow,int nCol,int nChars) {
         String[][] content = new String[nRow][nCol];
         String[] headers = new String[nCol];
-        for(int i=0;i<nCol;i++){
+        headers[0]="#";
+        for(int i=1;i<nCol;i++){
             headers[i]= RandomStringUtils.randomAlphabetic(1,nChars);
             for(int j=0;j<nRow;j++){
+                content[j][0]=String.valueOf(j);
                 content[j][i]=RandomStringUtils.randomAlphabetic(1,nChars);
             }
         }
@@ -121,20 +123,28 @@ public class DemoApplication  implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Report report = new ObjectMapper().readValue(
+        /*Report report = new ObjectMapper().readValue(
                 new File("./src/main/resources/report.json"),
-                Report.class);
+                Report.class);*/
 
         //testPdfBox();
         //System.out.println("PDF-DONE");
         //testHtml();
         //System.out.println("HTML-DONE");
 
-        //Utility.startTimer("TOTAL");
-        //new PDFTableGenerator().generatePDF(createContent(50000,25,12),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
-        //Utility.stopTimer("TOTAL");
+        Utility.startTimer("TOTAL");
+        //new PDFTableGenerator().generatePDF(createContent(50,9,12),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
 
-        //Utility.printTimers();
+        Report report = new Report(PDRectangle.A4,25,25,25,25);
+        report.render();
+        report.addPage();
+        report.render().save("src/main/resources/prove/components_"+System.currentTimeMillis()+".pdf");
+
+        Utility.stopTimer("TOTAL");
+
+
+
+        Utility.printTimers();
         System.out.println("DONE");
     }
 }
