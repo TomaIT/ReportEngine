@@ -22,7 +22,9 @@ public class Component {
     }
 
     public void addComponent(Component component){
-        // TODO There's bug if(components.stream().anyMatch(x->x.isOverlapped(component)))throw new RuntimeException("Component is overlapped with other Component");
+        // TODO There's bug
+        System.out.println();
+        if(components.stream().anyMatch(x->x.isOverlapped(component)))throw new RuntimeException("Component is overlapped with other Component");
         components.add(component);
     }
 
@@ -69,8 +71,7 @@ public class Component {
         double a = component.pdRectangle.getUpperRightX() - pdRectangle.getLowerLeftX(); // >0
         double b = pdRectangle.getUpperRightX() - component.pdRectangle.getLowerLeftX(); // >0
         double c = component.pdRectangle.getUpperRightY() - pdRectangle.getLowerLeftY(); // >0
-        double d = pdRectangle.getUpperRightY() - pdRectangle.getLowerLeftY(); // >0
-        //System.out.println(a+" "+b+" "+c+" "+d);
+        double d = pdRectangle.getUpperRightY() - component.pdRectangle.getLowerLeftY(); // >0
         return a > 0 && b > 0 && c > 0 && d > 0;
     }
 }
