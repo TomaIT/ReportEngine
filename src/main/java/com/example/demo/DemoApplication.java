@@ -2,6 +2,9 @@ package com.example.demo;
 
 import com.example.demo.reportengine.Component;
 import com.example.demo.reportengine.Report;
+import com.example.demo.reportengine.components.Footer;
+import com.example.demo.reportengine.components.Header;
+import com.example.demo.table.PDFTableGenerator;
 import com.example.demo.table.Table;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -135,12 +138,17 @@ public class DemoApplication  implements CommandLineRunner {
         //System.out.println("HTML-DONE");
 
         Utility.startTimer("TOTAL");
-        //new PDFTableGenerator().generatePDF(createContent(50,9,12),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
+        //new PDFTableGenerator().generatePDF(createContent(10,9,12),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
 
-        /*Report report = new Report(PDRectangle.A4,0,0,0,0);
-        report.render();
+        Report report = new Report(PDRectangle.A4,25,25,25,25);
+
+        report.setFooterInAllPages(Footer.voidFooter(report,25f));
+        report.setHeader(Header.voidHeader(report,37.3f));
+
         report.addPage();
-        report.render().save("src/main/resources/prove/components_"+System.currentTimeMillis()+".pdf");*/
+        report.addPage();
+        report.addPage();
+        report.render().save("src/main/resources/prove/components_"+System.currentTimeMillis()+".pdf");
 
         Utility.stopTimer("TOTAL");
 
@@ -148,7 +156,7 @@ public class DemoApplication  implements CommandLineRunner {
         Component b = new Component(new PDRectangle(9,9,100,100));
         System.out.println(b.isOverlapped(a));
 
-        PDType1Font.COURIER
+        //PDType1Font.COURIER
 
         Utility.printTimers();
         System.out.println("DONE");

@@ -27,7 +27,6 @@ public class Report {
     public Report(PDRectangle formatPage, float marginLeft, float marginRight, float marginTop, float marginBottom) {
         this.formatPage = formatPage;
         mediaBoxPage = new PDRectangle(formatPage.getLowerLeftX()+marginLeft,formatPage.getLowerLeftY()+marginBottom,formatPage.getWidth()-marginRight-marginLeft,formatPage.getHeight()-marginBottom-marginTop);
-        pages.add(new Component(mediaBoxPage));
     }
 
     public void setHeader(Component header) {
@@ -38,8 +37,8 @@ public class Report {
         headerInAllPages = true;
     }
 
-    public void setFooter(Component header) {
-        this.header = header;
+    public void setFooter(Component footer) {
+        this.footer = footer;
     }
     public void setFooterInAllPages(Component footer) {
         this.footer = footer;
