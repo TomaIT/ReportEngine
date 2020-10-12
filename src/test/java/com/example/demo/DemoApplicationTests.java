@@ -11,6 +11,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.awt.*;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -69,10 +70,10 @@ class DemoApplicationTests {
 
     @Test
     void testOverlapComponents() throws IOException {
-        Component a = new Component(new PDRectangle(0,0,2,2));
-        Component b = new Component(new PDRectangle(1,1,2,2));
-        Component c = new Component(new PDRectangle(2,2,2,2));
-        Component d = new Component(new PDRectangle(0,0,1,1));
+        Component a = new Component(new PDRectangle(0,0,2,2), Color.BLACK);
+        Component b = new Component(new PDRectangle(1,1,2,2), Color.BLACK);
+        Component c = new Component(new PDRectangle(2,2,2,2), Color.BLACK);
+        Component d = new Component(new PDRectangle(0,0,1,1), Color.BLACK);
 
         assertTrue(a.isOverlapped(b));assertTrue(b.isOverlapped(a));
 

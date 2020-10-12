@@ -142,21 +142,20 @@ public class DemoApplication  implements CommandLineRunner {
 
         Report report = new Report(PDRectangle.A4,25,25,25,25);
 
-        report.setFooterInAllPages(Footer.voidFooter(report,25f));
-        report.setHeader(Header.voidHeader(report,37.3f));
+        report.setFooter(Footer.voidFooter(report,25f,Color.BLUE));
+        report.setHeaderInAllPages(Header.voidHeader(report,50f,Color.RED));
 
-        report.addPage();
-        report.addPage();
-        report.addPage();
+        report.addPage(Color.BLACK);
+        report.getPages().get(0).addComponent(new Component(report.getPages().get(0).getFirstVoidSpace(),Color.GREEN));
+        report.addPage(Color.BLACK);
+
+        report.getPages().get(1).addComponent(new Component(report.getPages().get(1).getFirstVoidSpace(),Color.GREEN));
+        report.addPage(Color.BLACK);
         report.render().save("src/main/resources/prove/components_"+System.currentTimeMillis()+".pdf");
 
+        report.getPages().forEach(x->System.out.println(x.getFirstVoidSpace()));
+
         Utility.stopTimer("TOTAL");
-
-        Component a = new Component(new PDRectangle(0,0,10,10));
-        Component b = new Component(new PDRectangle(9,9,100,100));
-        System.out.println(b.isOverlapped(a));
-
-        //PDType1Font.COURIER
 
         Utility.printTimers();
         System.out.println("DONE");

@@ -22,7 +22,7 @@ public class Cell extends Component {
 
 
 
-    public Cell(PDRectangle pdRectangle) {
-        super(pdRectangle);
+    public Cell(PDRectangle pdRectangle, Color borderColor) {
+        super(pdRectangle,borderColor);
     }
 }

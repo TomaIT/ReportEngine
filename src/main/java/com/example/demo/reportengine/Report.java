@@ -46,9 +46,9 @@ public class Report {
     }
 
 
-    public void addPage(){
+    public void addPage(Color borderColor){
         if(header == null || footer == null) throw new RuntimeException("Please before call addPage() set header & footer");
-        Component page = new Component(mediaBoxPage);
+        Component page = new Component(mediaBoxPage, borderColor);
         if(headerInAllPages || pages.size()<=0) page.addComponent(header);
         if(footerInAllPages || pages.size()<=0) page.addComponent(footer);
         pages.add(page);
