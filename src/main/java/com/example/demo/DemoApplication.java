@@ -2,8 +2,10 @@ package com.example.demo;
 
 import com.example.demo.reportengine.Component;
 import com.example.demo.reportengine.Report;
+import com.example.demo.reportengine.components.Cell;
 import com.example.demo.reportengine.components.Footer;
 import com.example.demo.reportengine.components.Header;
+import com.example.demo.reportengine.components.HorizontalAlign;
 import com.example.demo.table.PDFTableGenerator;
 import com.example.demo.table.Table;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -126,6 +128,16 @@ public class DemoApplication  implements CommandLineRunner {
         return table;
     }
 
+    private static Cell create() {
+        Cell cell = new Cell();
+        cell.setBackground(Utility.hex2Rgb("#000000"));
+        cell.setColor(Utility.hex2Rgb("#fe9200"));
+        cell.setValue("Continental");
+        cell.setHorizontalAlign(HorizontalAlign.left);
+        cell.setFontType(PDType1Font.COURIER);
+        return cell;
+    }
+
     @Override
     public void run(String... args) throws Exception {
         /*Report report = new ObjectMapper().readValue(
@@ -142,11 +154,16 @@ public class DemoApplication  implements CommandLineRunner {
 
         Report report = new Report(PDRectangle.A4,25,25,25,25);
 
-        report.setFooter(Footer.voidFooter(report,25f,Color.BLUE));
+        Header header = new Header();
+        header.addCell(0,create());
+
+        report.setFooter(Footer.voidFooter(report,25f,Utility.hex2Rgb("#fe9200")));
         report.setHeaderInAllPages(Header.voidHeader(report,50f,Color.RED));
 
         report.addPage(Color.BLACK);
+        report.getPages().get(0).addComponent(new Component(new PDRectangle(25,250,report.getMediaBoxPage().getWidth(),37.32f),Color.CYAN));
         report.getPages().get(0).addComponent(new Component(report.getPages().get(0).getFirstVoidSpace(),Color.GREEN));
+        report.getPages().get(0).addComponent(new Component(report.getPages().get(0).getFirstVoidSpace(),Color.MAGENTA));
         report.addPage(Color.BLACK);
 
         report.getPages().get(1).addComponent(new Component(report.getPages().get(1).getFirstVoidSpace(),Color.GREEN));

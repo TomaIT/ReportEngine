@@ -2,6 +2,7 @@ package com.example.demo;
 
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.awt.*;
 import java.io.IOException;
@@ -36,6 +37,25 @@ public class Utility {
         } else {
             content.setStrokingColor(color);
             content.stroke();
+        }
+    }
+
+    public static Color hex2Rgb(String colorStr) {
+        return new Color(
+                Integer.valueOf( colorStr.substring( 1, 3 ), 16 ),
+                Integer.valueOf( colorStr.substring( 3, 5 ), 16 ),
+                Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) );
+    }
+
+    public static float getHeight(PDType1Font pdType1Font, float fontSize) {
+        return (float) (((double)pdType1Font.getFontDescriptor().getCapHeight() * fontSize) / 1000.0);
+    }
+
+    public static float getWidth(String text, PDType1Font pdType1Font, float fontSize) {
+        try {
+            return (float) (((double)pdType1Font.getStringWidth(text)*fontSize)/1000.0);
+        } catch (IOException e) {
+            return 0f;
         }
     }
 }

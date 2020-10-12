@@ -1,6 +1,7 @@
 package com.example.demo.reportengine;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
@@ -11,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
 public class Component {
     private PDRectangle pdRectangle;
     private Color borderColor;
@@ -22,13 +24,14 @@ public class Component {
     }
 
     public void addComponent(Component component){
-        if(components.stream().anyMatch(x->x.isOverlapped(component)))throw new RuntimeException("Component is overlapped with other Component");
+        checkOverlapping(component);
         components.add(component);
     }
 
     /**
      * Find the first empty rectangle on the page.
      * null if there are none
+     * It assumes components whose rectangles are as wide as all available space.
      * @return
      */
     public PDRectangle getFirstVoidSpace(){
@@ -65,10 +68,19 @@ public class Component {
         for(Component component : components) component.render(pdPageContentStream);
     }
 
+
+
     public boolean isOverlapped(Component component){
-        return component.pdRectangle.getUpperRightX() > pdRectangle.getLowerLeftX() &&
+        return component != null && component.pdRectangle != null && pdRectangle != null &&
+                component.pdRectangle.getUpperRightX() > pdRectangle.getLowerLeftX() &&
                 pdRectangle.getUpperRightX() > component.pdRectangle.getLowerLeftX() &&
                 component.pdRectangle.getUpperRightY() > pdRectangle.getLowerLeftY() &&
                 pdRectangle.getUpperRightY() > component.pdRectangle.getLowerLeftY();
+    }
+
+    public void checkOverlapping(Component component){
+        if(components.stream().anyMatch(x->x.isOverlapped(component))) {
+            throw new RuntimeException("Component is overlapped with other Component");
+        }
     }
 }

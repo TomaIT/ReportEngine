@@ -64,7 +64,7 @@ public class Report {
         for(Component component : pages){
             PDPage page = new PDPage(formatPage);
             pdDocument.addPage(page);
-            PDPageContentStream contentStream = new PDPageContentStream(pdDocument, page, PDPageContentStream.AppendMode.OVERWRITE, false);
+            PDPageContentStream contentStream = new PDPageContentStream(pdDocument, page, PDPageContentStream.AppendMode.OVERWRITE, true);
             component.render(contentStream);
             contentStream.close();
         }
