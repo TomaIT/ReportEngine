@@ -16,7 +16,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Header extends Component {
-    private static final double rowHeightFactor = 1.6f;
+    private static final double rowHeightFactor = 3.5f;
     private List<List<Cell>> matrixValues = new ArrayList<>();
 
     public Header() { super(); }
@@ -30,10 +30,38 @@ public class Header extends Component {
         matrixValues.get(nRow).add(cell);
     }
 
+    private float getMinHeightRow(List<Cell> row) {
+        return (float) (row.stream().mapToDouble(Cell::getHeight).max().orElse(0)*rowHeightFactor);
+    }
+
     public float getMinHeight() {
-        return (float) matrixValues.stream()
-                .mapToDouble(x->x.stream().mapToDouble(Cell::getHeight).max().orElse(0)*rowHeightFactor)
-                .sum();
+        return (float) matrixValues.stream().mapToDouble(this::getMinHeightRow).sum();
+    }
+
+    /**
+     * Costruisce i rettangoli per ogni cella.
+     * Suppone una suddivisione delle colonne equa. (es. 3 celle in una riga equivalgono a 3 colonne esattamente larghe uguali)
+     * Verifica che la cella cosi creata sia idonea a contenerne il contenuto, se cosi non è,
+     * applica logiche di riduzione del font per cercare di far stare il contenuto nello spazio dedicato.
+     */
+    public void build() {
+        for(int i=0;i<matrixValues.size();i++) {
+            List<Cell> row = matrixValues.get(i);
+            if(row.size()<=0) throw new RuntimeException("Cell row is void");
+            float minHeight = getMinHeightRow(row);
+            float columnWidth = getPdRectangle().getWidth()/row.size();
+            for(int j=0;j<row.size();j++) {
+                PDRectangle pdRectangle = new PDRectangle(
+                        getPdRectangle().getLowerLeftX()+j*columnWidth,
+                        getPdRectangle().getUpperRightY()-(i+1)*minHeight,
+                        columnWidth,
+                        minHeight);
+                row.get(j).setPdRectangle(pdRectangle);
+                row.get(j).setBorderColor(Color.PINK);
+                //TODO Attenzione codice pericoloso, verificare l'esistenza di soluzioni migliori :)
+                if (row.get(j).changeFontSizeToBeauty(1000)) j = 0;
+            }
+        }
     }
 
     @Override
@@ -53,6 +81,7 @@ public class Header extends Component {
         pdPageContentStream.stroke();
 
         for(Component component : this.getComponents()) component.render(pdPageContentStream);
+        for(List<Cell> row : matrixValues) for(Cell c : row) c.render(pdPageContentStream);
     }
 
 

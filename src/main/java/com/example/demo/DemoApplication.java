@@ -128,12 +128,12 @@ public class DemoApplication  implements CommandLineRunner {
         return table;
     }
 
-    private static Cell create() {
+    private static Cell createCell(HorizontalAlign align,String text) {
         Cell cell = new Cell();
         cell.setBackground(Utility.hex2Rgb("#000000"));
         cell.setColor(Utility.hex2Rgb("#fe9200"));
-        cell.setValue("Continental");
-        cell.setHorizontalAlign(HorizontalAlign.left);
+        cell.setValue(text);
+        cell.setHorizontalAlign(align);
         cell.setFontType(PDType1Font.COURIER);
         return cell;
     }
@@ -154,11 +154,16 @@ public class DemoApplication  implements CommandLineRunner {
 
         Report report = new Report(PDRectangle.A4,25,25,25,25);
 
-        Header header = new Header();
-        header.addCell(0,create());
+        Header header = Header.voidHeader(report,25f,Color.GRAY);
+        //header.addComponent(new Component());
+        header.addCell(0,createCell(HorizontalAlign.left,"Continental"));
+        header.addCell(0,createCell(HorizontalAlign.center,"ADIDAS"));
+        header.addCell(0,createCell(HorizontalAlign.right,"399$"));
+        header.addCell(1,createCell(HorizontalAlign.center,"oooooooooooo"));
+        header.build();
 
         report.setFooter(Footer.voidFooter(report,25f,Utility.hex2Rgb("#fe9200")));
-        report.setHeaderInAllPages(Header.voidHeader(report,50f,Color.RED));
+        report.setHeaderInAllPages(header);//Header.voidHeader(report,50f,Color.RED));
 
         report.addPage(Color.BLACK);
         report.getPages().get(0).addComponent(new Component(new PDRectangle(25,250,report.getMediaBoxPage().getWidth(),37.32f),Color.CYAN));

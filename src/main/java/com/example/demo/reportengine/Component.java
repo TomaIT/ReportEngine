@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Component {
     private PDRectangle pdRectangle;
-    private Color borderColor;
+    private Color borderColor = Color.BLACK;
     private List<Component> components = new ArrayList<>();
 
     public Component(PDRectangle pdRectangle, Color borderColor){
