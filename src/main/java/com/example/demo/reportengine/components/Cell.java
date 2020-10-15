@@ -2,8 +2,10 @@ package com.example.demo.reportengine.components;
 
 import com.example.demo.Utility;
 import com.example.demo.reportengine.Component;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Setter;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
@@ -19,8 +21,11 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Cell extends Component {
+    @Setter(AccessLevel.NONE)
     private static final float minMarginText = 2f;
+    @Setter(AccessLevel.NONE)
     private static final float underlineWidthFactor = 0.09f;
+    @Setter(AccessLevel.NONE)
     private static final float underlineMarginFactor = 0.15f;
     private String value = "";
     private HorizontalAlign horizontalAlign = HorizontalAlign.left;
@@ -30,9 +35,13 @@ public class Cell extends Component {
     private boolean underline = false;
     private Color color = Color.BLACK;
     private Color background = Color.WHITE;
+    @Setter(AccessLevel.NONE)
     private float minWidth;
+    @Setter(AccessLevel.NONE)
     private float minHeight;
+    @Setter(AccessLevel.NONE)
     private float textWidth;
+    @Setter(AccessLevel.NONE)
     private float textHeight;
 
     public Cell() { updateHeights();updateWidths(); }
