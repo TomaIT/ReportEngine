@@ -6,14 +6,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.util.Matrix;
 
 import java.awt.*;
 import java.io.IOException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Cell extends Component {
+    private static final float minMarginText = 2f;
     private static final float underlineWidthFactor = 0.09f;
     private static final float underlineMarginFactor = 0.15f;
     private String value = "";
@@ -24,76 +30,77 @@ public class Cell extends Component {
     private boolean underline = false;
     private Color color = Color.BLACK;
     private Color background = Color.WHITE;
-    private float width = Utility.getWidth(value,fontType,fontSize);
-    private float height = calcHeight(fontType,fontSize,underline);
+    private float minWidth;
+    private float minHeight;
 
-    public Cell() { }
+    public Cell() { updateMinHeight();updateMinWidth(); }
     public Cell(PDRectangle pdRectangle, Color borderColor) {
         super(pdRectangle,borderColor);
+        updateMinHeight();
+        updateMinWidth();
     }
 
-    private static float calcHeight(PDType1Font fontType, float fontSize, boolean isUnderline) {
-        if(isUnderline)return Utility.getHeight(fontType,fontSize) + (fontSize*underlineWidthFactor) + (fontSize*underlineMarginFactor);
-        return Utility.getHeight(fontType,fontSize);
+    private void updateMinHeight() {
+        minHeight = (underline) ?
+                Utility.getHeight(fontType,fontSize) + minMarginText*2 + (fontSize*underlineWidthFactor) + (fontSize*underlineMarginFactor) :
+                Utility.getHeight(fontType,fontSize) + minMarginText*2;
     }
+    private void updateMinWidth() {
+        minWidth = Utility.getWidth(value,fontType,fontSize)+ minMarginText*2;
+    }
+
 
     public void setFontSize(float fontSize) {
         this.fontSize = fontSize;
-        width = Utility.getWidth(value,fontType,fontSize);
-        height = calcHeight(fontType,fontSize,underline);
+        updateMinWidth();
+        updateMinHeight();
     }
     public void setValue(String value) {
         this.value = value;
-        width = Utility.getWidth(value,fontType,fontSize);
+        updateMinWidth();
     }
     public void setFontType(PDType1Font fontType) {
         this.fontType = fontType;
-        width = Utility.getWidth(value,fontType,fontSize);
-        height = calcHeight(fontType,fontSize,underline);
+        updateMinWidth();
+        updateMinHeight();
     }
     public void setUnderline(boolean underline) {
         this.underline = underline;
-        height = calcHeight(fontType,fontSize,underline);
+        updateMinHeight();
     }
 
-    public boolean isBeautiful() {
-        return getPdRectangle().getWidth()>=width && getPdRectangle().getHeight()>=height;
-    }
-
-    /**
-     * // TODO Optimization to perfomance :D (not necessary iteration)
-     * @param maxIteration
+    /** //TODO change anche height :D
+     * Assume il testo in singola riga. Quindi se necessario riduce la fontSize, per farlo stare nello spazio dedicato.
      * @return true se ha eseguito modifiche alla fontSize (quindi height and width), altrimenti false
      */
-    public boolean changeFontSizeToBeauty(int maxIteration){
-        if(isBeautiful())return false;
-        float saveFontSize = fontSize;
-        boolean changed = false;
-        for (int i=0;i<maxIteration && !isBeautiful() ;i++) setFontSize((float) (fontSize*0.95));
-        if (!isBeautiful()) {
-            fontSize = saveFontSize;
-            changed = false;
+    public boolean changeFontSizeToBeauty(){
+        if (getPdRectangle().getWidth() < minWidth) {
+            try {
+                setFontSize((float) ((getPdRectangle().getWidth()-minMarginText*2)*1000.0/fontType.getStringWidth(value)));
+                return true;
+            } catch (Exception ignored) { }
         }
-        return changed;
+        return false;
     }
 
     private void writeTextInRectangle(PDPageContentStream pdPageContentStream) throws IOException {
-        final float minMargin = 2f;
+        float textWidth = Utility.getWidth(value,fontType,fontSize);
+        float textHeight = Utility.getHeight(fontType,fontSize);
         pdPageContentStream.setNonStrokingColor(color);
         pdPageContentStream.beginText();
         pdPageContentStream.setFont(fontType,fontSize);
         float x ;
         float y ;
         switch (horizontalAlign) {
-            case right: x = getPdRectangle().getUpperRightX() - width - minMargin; break;
-            case center: x = getPdRectangle().getLowerLeftX() + (getPdRectangle().getWidth() - width) / 2.0f; break;
-            default: x = getPdRectangle().getLowerLeftX() + minMargin;
+            case right: x = getPdRectangle().getUpperRightX() - minMarginText - textWidth; break;
+            case center: x = getPdRectangle().getLowerLeftX() + (getPdRectangle().getWidth() - textWidth) / 2.0f; break;
+            default: x = getPdRectangle().getLowerLeftX() + minMarginText;
         }
         float underlineMargin = (underline) ? fontSize*underlineWidthFactor+fontSize*underlineMarginFactor : 0f;
         switch (verticalAlign) {
-            case top:  y = getPdRectangle().getUpperRightY()  - height + underlineMargin - minMargin; break;
-            case bottom: y = getPdRectangle().getLowerLeftY() + minMargin + underlineMargin; break;
-            default: y = getPdRectangle().getLowerLeftY() + (getPdRectangle().getHeight() - height ) / 2.0f +underlineMargin;
+            case top:  y = getPdRectangle().getUpperRightY() - textHeight - minMarginText; break;
+            case bottom: y = getPdRectangle().getLowerLeftY() + minMarginText + underlineMargin; break;
+            default: y = getPdRectangle().getLowerLeftY() + (getPdRectangle().getHeight() - textHeight - underlineMargin ) / 2.0f ;
         }
         pdPageContentStream.newLineAtOffset(x,y);
         pdPageContentStream.showText(value);
@@ -104,13 +111,14 @@ public class Cell extends Component {
             pdPageContentStream.setLineWidth(fontSize*underlineWidthFactor);
             pdPageContentStream.moveTo(x, y-fontSize*underlineMarginFactor);
             pdPageContentStream.setStrokingColor(color);
-            pdPageContentStream.lineTo(x+width, y-fontSize*underlineMarginFactor);
+            pdPageContentStream.lineTo(x + textWidth, y-fontSize*underlineMarginFactor);
             pdPageContentStream.stroke();
         }
     }
 
     @Override
     public void render(PDPageContentStream pdPageContentStream) throws IOException {
+        final float lineWidth = 1.5f; pdPageContentStream.setLineWidth(lineWidth); // TODO remove
         //pdPageContentStream.setNonStrokingColor(background); // TODO add
         pdPageContentStream.setStrokingColor(background); // TODO remove
         pdPageContentStream.addRect(getPdRectangle().getLowerLeftX(), getPdRectangle().getLowerLeftY(), getPdRectangle().getWidth(), getPdRectangle().getHeight());
@@ -121,76 +129,4 @@ public class Cell extends Component {
         for(Component component : getComponents()) component.render(pdPageContentStream);
 
     }
-    /** Justified TEXT
-     * // Get the non-justified string width in text space units.
-     *             float stringWidth = font.getStringWidth(message) * FONT_SIZE;
-     *             // Get the string height in text space units.
-     *             float stringHeight = font.getFontDescriptor().getFontBoundingBox().getHeight() * FONT_SIZE;
-     *             // Get the width we have to justify in.
-     *             PDRectangle pageSize = page.getMediaBox();
-     *             try (PDPageContentStream contentStream = new PDPageContentStream(doc, page, AppendMode.OVERWRITE, false)) {
-     *                 contentStream.beginText();
-     *                 contentStream.setFont(font, FONT_SIZE);
-     *                 // Start at top of page.
-     *                 contentStream.setTextMatrix(Matrix.getTranslateInstance(0, pageSize.getHeight() - stringHeight / 1000f));
-     *                 // First show non-justified.
-     *                 contentStream.showText(message);
-     *                 // Move to next line.
-     *                 contentStream.setTextMatrix(Matrix.getTranslateInstance(0, pageSize.getHeight() - stringHeight / 1000f * 2));
-     *                 // Now show word justified.
-     *                 // The space we have to make up, in text space units.
-     *                 float justifyWidth = pageSize.getWidth() * 1000f - stringWidth;
-     *                 List<Object> text = new ArrayList<>();
-     *                 String[] parts = message.split("\\s");
-     *                 float spaceWidth = (justifyWidth / (parts.length - 1)) / FONT_SIZE;
-     *                 for (int i = 0; i < parts.length; i++) {
-     *                     if (i != 0) {
-     *                         text.add(" ");
-     *                         // Positive values move to the left, negative to the right.
-     *                         text.add(-spaceWidth);
-     *                     }
-     *                     text.add(parts[i]);
-     *                 }
-     *                 contentStream.showTextWithPositioning(text.toArray());
-     *                 contentStream.setTextMatrix(Matrix.getTranslateInstance(0, pageSize.getHeight() - stringHeight / 1000f * 3));
-     *                 // Now show letter justified.
-     *                 text = new ArrayList<>();
-     *                 justifyWidth = pageSize.getWidth() * 1000f - stringWidth;
-     *                 float extraLetterWidth = (justifyWidth / (message.codePointCount(0, message.length()) - 1)) / FONT_SIZE;
-     *                 for (int i = 0; i < message.length(); i += Character.charCount(message.codePointAt(i))) {
-     *                     if (i != 0) {
-     *                         text.add(-extraLetterWidth);
-     *                     }
-     *                     text.add(String.valueOf(Character.toChars(message.codePointAt(i))));
-     *                 }
-     *                 contentStream.showTextWithPositioning(text.toArray());
-     *                 // PDF specification about word spacing:
-     *                 // "Word spacing shall be applied to every occurrence of the single-byte character
-     *                 // code 32 in a string when using a simple font or a composite font that defines
-     *                 // code 32 as a single-byte code. It shall not apply to occurrences of the byte
-     *                 // value 32 in multiple-byte codes.
-     *                 // TrueType font with no word spacing
-     *                 contentStream.setTextMatrix(Matrix.getTranslateInstance(0, pageSize.getHeight() - stringHeight / 1000f * 4));
-     *                 font = PDTrueTypeFont.load(doc, PDDocument.class.getResourceAsStream("/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf"),
-     *                         WinAnsiEncoding.INSTANCE);
-     *                 contentStream.setFont(font, FONT_SIZE);
-     *                 contentStream.showText(message);
-     *                 float wordSpacing = (pageSize.getWidth() * 1000f - stringWidth) / (parts.length - 1) / 1000;
-     *                 // TrueType font with word spacing
-     *                 contentStream.setTextMatrix(Matrix.getTranslateInstance(0, pageSize.getHeight() - stringHeight / 1000f * 5));
-     *                 font = PDTrueTypeFont.load(doc, PDDocument.class.getResourceAsStream("/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf"),
-     *                         WinAnsiEncoding.INSTANCE);
-     *                 contentStream.setFont(font, FONT_SIZE);
-     *                 contentStream.setWordSpacing(wordSpacing);
-     *                 contentStream.showText(message);
-     *                 // Type0 font with word spacing that has no effect
-     *                 contentStream.setTextMatrix(Matrix.getTranslateInstance(0, pageSize.getHeight() - stringHeight / 1000f * 6));
-     *                 font = PDType0Font.load(doc, PDDocument.class.getResourceAsStream("/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf"));
-     *                 contentStream.setFont(font, FONT_SIZE);
-     *                 contentStream.setWordSpacing(wordSpacing);
-     *                 contentStream.showText(message);
-     *                 // Finish up.
-     *                 contentStream.endText();
-     *
-     */
 }

@@ -16,7 +16,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Header extends Component {
-    private static final double rowHeightFactor = 3.5f;
+    private static final double rowHeightFactor = 3f;
     private List<List<Cell>> matrixValues = new ArrayList<>();
 
     public Header() { super(); }
@@ -31,7 +31,7 @@ public class Header extends Component {
     }
 
     private float getMinHeightRow(List<Cell> row) {
-        return (float) (row.stream().mapToDouble(Cell::getHeight).max().orElse(0)*rowHeightFactor);
+        return (float) (row.stream().mapToDouble(Cell::getMinHeight).max().orElse(0)*rowHeightFactor);
     }
 
     public float getMinHeight() {
@@ -49,18 +49,19 @@ public class Header extends Component {
         for(int i=0;i<matrixValues.size();i++) {
             List<Cell> row = matrixValues.get(i);
             if(row.size()<=0) throw new RuntimeException("Cell row is void");
-            float minHeight = getMinHeightRow(row);
+            //float minHeight = getMinHeightRow(row);
             float columnWidth = getPdRectangle().getWidth()/row.size();
             for(int j=0;j<row.size();j++) {
                 PDRectangle pdRectangle = new PDRectangle(
                         getPdRectangle().getLowerLeftX()+j*columnWidth,
-                        getPdRectangle().getUpperRightY()-(i+1)*minHeight,
+                        getPdRectangle().getUpperRightY() - (float)matrixValues.stream().limit(i+1).mapToDouble(this::getMinHeightRow).sum(), // TODO perfomance improve
                         columnWidth,
-                        minHeight);
+                        getMinHeightRow(row)); // TODO performanceImprove
                 row.get(j).setPdRectangle(pdRectangle);
                 row.get(j).setBorderColor(Color.PINK);
-                //TODO Attenzione codice pericoloso, verificare l'esistenza di soluzioni migliori :)
-                if (row.get(j).changeFontSizeToBeauty(1000)) j = 0;
+                if (row.get(j).changeFontSizeToBeauty()) {
+                    j = -1;
+                }
             }
             sumHeight += row.get(0).getPdRectangle().getHeight();
         }

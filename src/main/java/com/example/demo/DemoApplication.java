@@ -125,12 +125,12 @@ public class DemoApplication  implements CommandLineRunner {
         return table;
     }
 
-    private static Cell createCell(HorizontalAlign align,String text) {
+    private static Cell createCell(HorizontalAlign align,String text,boolean underline) {
         Cell cell = new Cell();
         cell.setBackground(Color.CYAN);
-        cell.setColor(Utility.hex2Rgb("#fe9200"));
+        cell.setColor(Utility.hex2Rgb("#000000"));
         cell.setValue(text);
-        cell.setUnderline(false);
+        cell.setUnderline(underline);
         cell.setHorizontalAlign(align);
         //cell.setVerticalAlign(VerticalAlign.bottom);
         cell.setFontType(PDType1Font.COURIER);
@@ -155,10 +155,10 @@ public class DemoApplication  implements CommandLineRunner {
 
         Header header = Header.voidHeader(report,25f,Color.GRAY);
         //header.addComponent(new Component());
-        header.addCell(0,createCell(HorizontalAlign.left,"Continental"));
-        header.addCell(0,createCell(HorizontalAlign.center,"ADIDAS"));
-        header.addCell(0,createCell(HorizontalAlign.right,"399$"));
-        header.addCell(1,createCell(HorizontalAlign.center,"oooooooooooo"));
+        header.addCell(0,createCell(HorizontalAlign.left,"Continental prova ciao lalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaala",false));
+        header.addCell(0,createCell(HorizontalAlign.center,"ADIDAS prova ciao lalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaala",true));
+        header.addCell(0,createCell(HorizontalAlign.right,"399$ prova ciao lalallalalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalallaala",false));
+        header.addCell(1,createCell(HorizontalAlign.center,"oooooooooooo prova ciao",true));
         header.build();
 
         report.setFooter(Footer.voidFooter(report,25f,Utility.hex2Rgb("#fe9200")));
