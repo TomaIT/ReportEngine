@@ -32,41 +32,45 @@ public class Cell extends Component {
     private Color background = Color.WHITE;
     private float minWidth;
     private float minHeight;
+    private float textWidth;
+    private float textHeight;
 
-    public Cell() { updateMinHeight();updateMinWidth(); }
+    public Cell() { updateHeights();updateWidths(); }
     public Cell(PDRectangle pdRectangle, Color borderColor) {
         super(pdRectangle,borderColor);
-        updateMinHeight();
-        updateMinWidth();
+        updateHeights();
+        updateWidths();
     }
 
-    private void updateMinHeight() {
+    private void updateHeights() {
+        textHeight = Utility.getHeight(fontType,fontSize);
         minHeight = (underline) ?
-                Utility.getHeight(fontType,fontSize) + minMarginText*2 + (fontSize*underlineWidthFactor) + (fontSize*underlineMarginFactor) :
-                Utility.getHeight(fontType,fontSize) + minMarginText*2;
+                textHeight + minMarginText*2 + (fontSize*underlineWidthFactor) + (fontSize*underlineMarginFactor) :
+                textHeight + minMarginText*2;
     }
-    private void updateMinWidth() {
-        minWidth = Utility.getWidth(value,fontType,fontSize)+ minMarginText*2;
+    private void updateWidths() {
+        textWidth = Utility.getWidth(value,fontType,fontSize);
+        minWidth = textWidth + minMarginText*2;
     }
 
 
     public void setFontSize(float fontSize) {
         this.fontSize = fontSize;
-        updateMinWidth();
-        updateMinHeight();
+        updateWidths();
+        updateHeights();
     }
     public void setValue(String value) {
         this.value = value;
-        updateMinWidth();
+        updateWidths();
     }
     public void setFontType(PDType1Font fontType) {
         this.fontType = fontType;
-        updateMinWidth();
-        updateMinHeight();
+        updateWidths();
+        updateHeights();
     }
     public void setUnderline(boolean underline) {
         this.underline = underline;
-        updateMinHeight();
+        updateHeights();
     }
 
     /** //TODO change anche height :D
@@ -84,8 +88,6 @@ public class Cell extends Component {
     }
 
     private void writeTextInRectangle(PDPageContentStream pdPageContentStream) throws IOException {
-        float textWidth = Utility.getWidth(value,fontType,fontSize);
-        float textHeight = Utility.getHeight(fontType,fontSize);
         pdPageContentStream.setNonStrokingColor(color);
         pdPageContentStream.beginText();
         pdPageContentStream.setFont(fontType,fontSize);
