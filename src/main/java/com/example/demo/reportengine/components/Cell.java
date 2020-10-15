@@ -24,9 +24,9 @@ public class Cell extends Component {
     @Setter(AccessLevel.NONE)
     private static final float minMarginText = 2f;
     @Setter(AccessLevel.NONE)
-    private static final float underlineWidthFactor = 0.09f;
+    private static final float underlineWidthFactor = 0.03f;
     @Setter(AccessLevel.NONE)
-    private static final float underlineMarginFactor = 0.15f;
+    private static final float underlineMarginFactor = 0.08f;
     private String value = "";
     private HorizontalAlign horizontalAlign = HorizontalAlign.left;
     private VerticalAlign verticalAlign = VerticalAlign.center;

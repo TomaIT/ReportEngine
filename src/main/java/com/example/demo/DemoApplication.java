@@ -154,18 +154,20 @@ public class DemoApplication  implements CommandLineRunner {
         Report report = new Report(PDRectangle.A4,25,25,25,25);
 
         Header header = Header.voidHeader(report,25f,Color.GRAY);
-        //header.addComponent(new Component());
-        header.addCell(0,createCell(HorizontalAlign.left,"Continental prova ciao lalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaala",false));
-        header.addCell(0,createCell(HorizontalAlign.center,"ADIDAS prova ciao lalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaala",true));
-        header.addCell(0,createCell(HorizontalAlign.right,"399$ prova ciao lalallalalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalallaala",false));
-        header.addCell(1,createCell(HorizontalAlign.center,"oooooooooooo prova ciao",true));
+        for(int i=0;i<18;i+=2) {
+            header.addCell(i, createCell(HorizontalAlign.left, "Continental prova ciao lalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaala", false));
+            header.addCell(i, createCell(HorizontalAlign.center, "ADIDAS prova ciao lalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaala", true));
+            header.addCell(i, createCell(HorizontalAlign.right, "399$ prova ciao lalallalalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalallaala", false));
+            header.addCell(i+1, createCell(HorizontalAlign.center, "oooooooooooo prova ciao", true));
+        }
+
         header.build();
 
-        report.setFooter(Footer.voidFooter(report,25f,Utility.hex2Rgb("#fe9200")));
+        report.setFooter(Footer.voidFooter(report,3f,Utility.hex2Rgb("#fe9200")));
         report.setHeaderInAllPages(header);//Header.voidHeader(report,50f,Color.RED));
 
         report.addPage(Color.BLACK);
-        report.getPages().get(0).addComponent(new Component(new PDRectangle(25,250,report.getMediaBoxPage().getWidth(),37.32f),Color.CYAN));
+        report.getPages().get(0).addComponent(new Component(new PDRectangle(25,250,report.getMediaBoxPage().getWidth(),11.3f),Color.CYAN));
         report.getPages().get(0).addComponent(new Component(report.getPages().get(0).getFirstVoidSpace(),Color.GREEN));
         report.getPages().get(0).addComponent(new Component(report.getPages().get(0).getFirstVoidSpace(),Color.MAGENTA));
         report.addPage(Color.BLACK);
