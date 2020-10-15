@@ -130,7 +130,7 @@ public class DemoApplication  implements CommandLineRunner {
 
     private static Cell createCell(HorizontalAlign align,String text) {
         Cell cell = new Cell();
-        cell.setBackground(Utility.hex2Rgb("#000000"));
+        //cell.setBackground(Utility.hex2Rgb("#000000"));
         cell.setColor(Utility.hex2Rgb("#fe9200"));
         cell.setValue(text);
         cell.setHorizontalAlign(align);
