@@ -14,9 +14,8 @@ import java.io.IOException;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Cell extends Component {
-    /**
-     * TODO underline has influence in height calculation
-     */
+    private static final float underlineWidthFactor = 0.09f;
+    private static final float underlineMarginFactor = 0.15f;
     private String value = "";
     private HorizontalAlign horizontalAlign = HorizontalAlign.left;
     private VerticalAlign verticalAlign = VerticalAlign.center;
@@ -26,17 +25,22 @@ public class Cell extends Component {
     private Color color = Color.BLACK;
     private Color background = Color.WHITE;
     private float width = Utility.getWidth(value,fontType,fontSize);
-    private float height = Utility.getHeight(fontType,fontSize);
+    private float height = calcHeight(fontType,fontSize,underline);
 
     public Cell() { }
     public Cell(PDRectangle pdRectangle, Color borderColor) {
         super(pdRectangle,borderColor);
     }
 
+    private static float calcHeight(PDType1Font fontType, float fontSize, boolean isUnderline) {
+        if(isUnderline)return Utility.getHeight(fontType,fontSize) + (fontSize*underlineWidthFactor) + (fontSize*underlineMarginFactor);
+        return Utility.getHeight(fontType,fontSize);
+    }
+
     public void setFontSize(float fontSize) {
         this.fontSize = fontSize;
         width = Utility.getWidth(value,fontType,fontSize);
-        height = Utility.getHeight(fontType,fontSize);
+        height = calcHeight(fontType,fontSize,underline);
     }
     public void setValue(String value) {
         this.value = value;
@@ -45,7 +49,11 @@ public class Cell extends Component {
     public void setFontType(PDType1Font fontType) {
         this.fontType = fontType;
         width = Utility.getWidth(value,fontType,fontSize);
-        height = Utility.getHeight(fontType,fontSize);
+        height = calcHeight(fontType,fontSize,underline);
+    }
+    public void setUnderline(boolean underline) {
+        this.underline = underline;
+        height = calcHeight(fontType,fontSize,underline);
     }
 
     public boolean isBeautiful() {
@@ -71,38 +79,42 @@ public class Cell extends Component {
 
     private void writeTextInRectangle(PDPageContentStream pdPageContentStream) throws IOException {
         final float minMargin = 2f;
-        //TODO
         pdPageContentStream.setNonStrokingColor(color);
         pdPageContentStream.beginText();
         pdPageContentStream.setFont(fontType,fontSize);
         float x ;
-        float y = getPdRectangle().getLowerLeftY();
+        float y ;
         switch (horizontalAlign) {
-            case left:  x = getPdRectangle().getLowerLeftX() + minMargin; break;
             case right: x = getPdRectangle().getUpperRightX() - width - minMargin; break;
             case center: x = getPdRectangle().getLowerLeftX() + (getPdRectangle().getWidth() - width) / 2.0f; break;
             default: x = getPdRectangle().getLowerLeftX() + minMargin;
         }
+        float underlineMargin = (underline) ? fontSize*underlineWidthFactor+fontSize*underlineMarginFactor : 0f;
         switch (verticalAlign) {
-            case top:  y = getPdRectangle().getUpperRightY()  - width - minMargin; break;
-            case bottom: y = getPdRectangle().getLowerLeftY() + minMargin; break;
-            case center: y = getPdRectangle().getLowerLeftY() + (getPdRectangle().getHeight() - height) / 2.0f; break;
-            default: y = getPdRectangle().getLowerLeftY() + minMargin;
+            case top:  y = getPdRectangle().getUpperRightY()  - height + underlineMargin - minMargin; break;
+            case bottom: y = getPdRectangle().getLowerLeftY() + minMargin + underlineMargin; break;
+            default: y = getPdRectangle().getLowerLeftY() + (getPdRectangle().getHeight() - height ) / 2.0f +underlineMargin;
         }
         pdPageContentStream.newLineAtOffset(x,y);
         pdPageContentStream.showText(value);
+
         pdPageContentStream.endText();
+
+        if (underline) {
+            pdPageContentStream.setLineWidth(fontSize*underlineWidthFactor);
+            pdPageContentStream.moveTo(x, y-fontSize*underlineMarginFactor);
+            pdPageContentStream.setStrokingColor(color);
+            pdPageContentStream.lineTo(x+width, y-fontSize*underlineMarginFactor);
+            pdPageContentStream.stroke();
+        }
     }
 
     @Override
     public void render(PDPageContentStream pdPageContentStream) throws IOException {
-        final float lineWidth = 1.5f;
-
-
-
-        //pdPageContentStream.setLineWidth(lineWidth);
-        pdPageContentStream.setNonStrokingColor(background);
-        pdPageContentStream.fillRect(getPdRectangle().getLowerLeftX(), getPdRectangle().getLowerLeftY(), getPdRectangle().getWidth(), getPdRectangle().getHeight());
+        //pdPageContentStream.setNonStrokingColor(background); // TODO add
+        pdPageContentStream.setStrokingColor(background); // TODO remove
+        pdPageContentStream.addRect(getPdRectangle().getLowerLeftX(), getPdRectangle().getLowerLeftY(), getPdRectangle().getWidth(), getPdRectangle().getHeight());
+        //pdPageContentStream.fill(); // TODO add
         pdPageContentStream.stroke();
         writeTextInRectangle(pdPageContentStream);
 

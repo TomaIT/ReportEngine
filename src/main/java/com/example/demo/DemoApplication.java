@@ -2,10 +2,7 @@ package com.example.demo;
 
 import com.example.demo.reportengine.Component;
 import com.example.demo.reportengine.Report;
-import com.example.demo.reportengine.components.Cell;
-import com.example.demo.reportengine.components.Footer;
-import com.example.demo.reportengine.components.Header;
-import com.example.demo.reportengine.components.HorizontalAlign;
+import com.example.demo.reportengine.components.*;
 import com.example.demo.table.PDFTableGenerator;
 import com.example.demo.table.Table;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -130,10 +127,12 @@ public class DemoApplication  implements CommandLineRunner {
 
     private static Cell createCell(HorizontalAlign align,String text) {
         Cell cell = new Cell();
-        //cell.setBackground(Utility.hex2Rgb("#000000"));
+        cell.setBackground(Color.CYAN);
         cell.setColor(Utility.hex2Rgb("#fe9200"));
         cell.setValue(text);
+        cell.setUnderline(false);
         cell.setHorizontalAlign(align);
+        //cell.setVerticalAlign(VerticalAlign.bottom);
         cell.setFontType(PDType1Font.COURIER);
         return cell;
     }

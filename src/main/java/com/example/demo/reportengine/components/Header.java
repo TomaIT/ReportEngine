@@ -45,6 +45,7 @@ public class Header extends Component {
      * applica logiche di riduzione del font per cercare di far stare il contenuto nello spazio dedicato.
      */
     public void build() {
+        float sumHeight = 0;
         for(int i=0;i<matrixValues.size();i++) {
             List<Cell> row = matrixValues.get(i);
             if(row.size()<=0) throw new RuntimeException("Cell row is void");
@@ -61,7 +62,10 @@ public class Header extends Component {
                 //TODO Attenzione codice pericoloso, verificare l'esistenza di soluzioni migliori :)
                 if (row.get(j).changeFontSizeToBeauty(1000)) j = 0;
             }
+            sumHeight += row.get(0).getPdRectangle().getHeight();
         }
+        PDRectangle old = getPdRectangle();
+        setPdRectangle(new PDRectangle(old.getLowerLeftX(),old.getUpperRightY()-sumHeight,old.getWidth(),sumHeight));
     }
 
     @Override
