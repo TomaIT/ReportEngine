@@ -1,12 +1,10 @@
 package com.example.demo.reportengine;
 
-import com.example.demo.reportengine.components.Header;
 import lombok.Data;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDFont;
 
 import java.awt.*;
 import java.io.IOException;

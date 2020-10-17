@@ -2,7 +2,9 @@ package com.example.demo;
 
 import com.example.demo.reportengine.Component;
 import com.example.demo.reportengine.Report;
-import com.example.demo.reportengine.components.*;
+import com.example.demo.reportengine.components.Footer;
+import com.example.demo.reportengine.components.Header;
+import com.example.demo.reportengine.components.TextCell;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;
 import com.example.demo.table.Table;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -22,8 +24,10 @@ import java.awt.*;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootApplication
 public class DemoApplication  implements CommandLineRunner {

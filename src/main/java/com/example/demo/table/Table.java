@@ -1,13 +1,14 @@
 package com.example.demo.table;
 
 import com.example.demo.Utility;
-import lombok.*;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
 @EqualsAndHashCode
 @ToString

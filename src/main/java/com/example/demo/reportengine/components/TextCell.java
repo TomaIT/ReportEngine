@@ -146,6 +146,22 @@ public class TextCell extends Component {
         return false;
     }
 
+    @Override
+    public void render(PDPageContentStream pdPageContentStream) throws IOException {
+        //if(getPdRectangle()==null) throw new RuntimeException("Must be call build() before render.");
+
+        if(getPdRectangle()!=null) {
+            final float lineWidth = 0.3f; pdPageContentStream.setLineWidth(lineWidth);pdPageContentStream.setStrokingColor(background); // TODO remove
+            //pdPageContentStream.setNonStrokingColor(background); // TODO add
+            pdPageContentStream.addRect(getPdRectangle().getLowerLeftX(), getPdRectangle().getLowerLeftY(), getPdRectangle().getWidth(), getPdRectangle().getHeight());
+            //pdPageContentStream.fill(); // TODO add
+            pdPageContentStream.stroke();
+            if(value != null && !value.isBlank())writeTextInRectangle(pdPageContentStream);
+        }
+        for(Component component : getComponents()) component.render(pdPageContentStream);
+
+    }
+
     private String shortens(String value,float maxWidth,PDType1Font fontType,float fontSize) { // TODO inefficient performance
         final int nCharsSubstitute = 3;
         while (Utility.getWidth(value,fontType,fontSize) > maxWidth) {
@@ -228,19 +244,4 @@ public class TextCell extends Component {
         }
     }
 
-    @Override
-    public void render(PDPageContentStream pdPageContentStream) throws IOException {
-        //if(getPdRectangle()==null) throw new RuntimeException("Must be call build() before render.");
-
-        if(getPdRectangle()!=null) {
-            final float lineWidth = 0.3f; pdPageContentStream.setLineWidth(lineWidth);pdPageContentStream.setStrokingColor(background); // TODO remove
-            //pdPageContentStream.setNonStrokingColor(background); // TODO add
-            pdPageContentStream.addRect(getPdRectangle().getLowerLeftX(), getPdRectangle().getLowerLeftY(), getPdRectangle().getWidth(), getPdRectangle().getHeight());
-            //pdPageContentStream.fill(); // TODO add
-            pdPageContentStream.stroke();
-            if(value != null && !value.isBlank())writeTextInRectangle(pdPageContentStream);
-        }
-        for(Component component : getComponents()) component.render(pdPageContentStream);
-
-    }
 }
