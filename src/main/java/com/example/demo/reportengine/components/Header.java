@@ -18,7 +18,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Header extends Component {
-    @Setter(AccessLevel.NONE) private static final float rowMinMargin = 2f;
+    @Setter(AccessLevel.NONE) private static final float rowMinMargin = 20f;
     private List<List<TextCell>> matrixValues = new ArrayList<>();
 
     public Header() { super(); }
@@ -53,6 +53,14 @@ public class Header extends Component {
             if(row.size()<=0) throw new RuntimeException("Cell row is void");
             float minHeight = getMinHeightRow(row);
             float columnWidth = getPdRectangle().getWidth()/row.size();
+            for(int j=0;j<row.size();j++) {
+                if(row.get(j).build(
+                        getPdRectangle().getLowerLeftX()+j*columnWidth,
+                        getPdRectangle().getUpperRightY() - (float)matrixValues.stream().limit(i).mapToDouble(this::getMinHeightRow).sum(),
+                        columnWidth,
+                        getMinHeightRow(row)
+                )){j=-1;}
+            }
             for(int j=0;j<row.size();j++) {
                 if(row.get(j).build(
                         getPdRectangle().getLowerLeftX()+j*columnWidth,

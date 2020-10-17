@@ -25,7 +25,7 @@ public class TextCell extends Component {
     @Setter(AccessLevel.NONE) private static final float underlineMarginFactor = 0.08f;
     private String value = "";
     private HorizontalAlign horizontalAlign = HorizontalAlign.left;
-    private VerticalAlign verticalAlign = VerticalAlign.center;
+    private VerticalAlign verticalAlign = VerticalAlign.top;
     private PDType1Font fontType = PDType1Font.HELVETICA;
     private float fontSize = 12f;
     private boolean underline = false;
@@ -96,6 +96,7 @@ public class TextCell extends Component {
      * @param maxWidth
      * @param minHeight
      * @return true se ha aumentato la height rispetto a minHeight, altrimenti false
+     * NOTA: se true necessita ricalcolo se si vuole aggiungere margine
      */
     @Override
     public boolean build(float startX,float endY,float maxWidth,float minHeight) {
@@ -106,6 +107,39 @@ public class TextCell extends Component {
         if (minWidth > maxWidth) {
             if (split.length > 1) return buildAreaText(startX,endY,maxWidth,minHeight,split);
             setValue(shortens(value,maxWidth,fontType,fontSize));
+        }
+        //se areaText necessita riposizinamento sulla y
+        if(getComponents().size()>0) {
+            float offset;
+            boolean isAlreadyChanged;
+            float minY = (float) getComponents().stream().mapToDouble(x->x.getPdRectangle().getLowerLeftY()).min().orElse(-1);
+            float maxY = (float) getComponents().stream().mapToDouble(x->x.getPdRectangle().getUpperRightY()).max().orElse(-1);
+            switch (verticalAlign) {
+                case top:
+                    offset = 0;
+                    isAlreadyChanged = (maxY == endY);
+                    break;
+                case bottom:
+                    offset = minHeight-this.minHeight;
+                    isAlreadyChanged = (minY == endY-minHeight);
+                    break;
+                case center:
+                    offset = (minHeight-this.minHeight) / 2;
+                    isAlreadyChanged = (maxY == endY-offset);
+                    break;
+                default:
+                    throw new RuntimeException("Not yet implemented VerticalAlign: "+verticalAlign);
+            }
+            //Prima verifico che il cambiamento non sia già stato fatto
+            if (!isAlreadyChanged) {
+                for (Component c : getComponents()) {
+                    c.setPdRectangle(new PDRectangle(
+                            c.getPdRectangle().getLowerLeftX(),
+                            c.getPdRectangle().getLowerLeftY() - offset,
+                            c.getPdRectangle().getWidth(),
+                            c.getPdRectangle().getHeight()));
+                }
+            }
         }
 
         setPdRectangle(new PDRectangle(startX,endY-minHeight,maxWidth,minHeight));
@@ -129,7 +163,7 @@ public class TextCell extends Component {
             } else {
                 for(int j=i+1;j<split.length;j++){
                     if(Utility.getWidth(value+" "+split[j],fontType,fontSize) > maxWidth) break;
-                    value+=" "+split[j];
+                    value += " "+split[j];
                     i++;
                 }
             }
@@ -140,19 +174,20 @@ public class TextCell extends Component {
 
     private boolean buildAreaText(float startX,float endY,float maxWidth,float minHeight,String[] split) {
         List<TextCell> cells = new ArrayList<>();
-        float tempHeight = minHeight/split.length;
-        float height = (this.minHeight<tempHeight) ? tempHeight : this.minHeight;
         String[] values = buildStringsWithMaxWidth(split,maxWidth,fontType,fontSize);
+
+        float tempHeight = minHeight/values.length;
+        float height = (this.minHeight<tempHeight) ? tempHeight : this.minHeight;
+        float totHeight = height * values.length;
 
         for (int i=0;i<values.length;i++) {
             TextCell temp = new TextCell(this);
             temp.setValue(values[i]);
-            temp.setBackground(Color.PINK);
             //Return always false
             temp.build(startX,endY-i*height,maxWidth,height);
             cells.add(temp);
         }
-        float totHeight = (float) cells.stream().mapToDouble(x->x.getPdRectangle().getHeight()).sum();
+
         setPdRectangle(new PDRectangle(startX,endY-totHeight,maxWidth,totHeight));
         cells.forEach(x->getComponents().add(x));
         setValue("");
@@ -167,15 +202,17 @@ public class TextCell extends Component {
         float x ;
         float y ;
         switch (horizontalAlign) {
+            case left: x = getPdRectangle().getLowerLeftX() + minMarginText; break;
             case right: x = getPdRectangle().getUpperRightX() - minMarginText - textWidth; break;
             case center: x = getPdRectangle().getLowerLeftX() + (getPdRectangle().getWidth() - textWidth) / 2.0f; break;
-            default: x = getPdRectangle().getLowerLeftX() + minMarginText;
+            default: throw new RuntimeException("Not yet implemented HorizontalAlign: "+horizontalAlign);
         }
         float underlineMargin = (underline) ? fontSize*underlineWidthFactor+fontSize*underlineMarginFactor : 0f;
         switch (verticalAlign) {
             case top:  y = getPdRectangle().getUpperRightY() - textHeight - minMarginText; break;
+            case center: y = getPdRectangle().getLowerLeftY() + (getPdRectangle().getHeight() - textHeight - underlineMargin ) / 2.0f ; break;
             case bottom: y = getPdRectangle().getLowerLeftY() + minMarginText + underlineMargin; break;
-            default: y = getPdRectangle().getLowerLeftY() + (getPdRectangle().getHeight() - textHeight - underlineMargin ) / 2.0f ;
+            default: throw new RuntimeException("Not yet implemented VerticalAlign: "+verticalAlign);
         }
         pdPageContentStream.newLineAtOffset(x,y);
         pdPageContentStream.showText(value);
@@ -194,17 +231,16 @@ public class TextCell extends Component {
     @Override
     public void render(PDPageContentStream pdPageContentStream) throws IOException {
         //if(getPdRectangle()==null) throw new RuntimeException("Must be call build() before render.");
-        for(Component component : getComponents()) component.render(pdPageContentStream);
+
         if(getPdRectangle()!=null) {
-            final float lineWidth = 0.3f;
-            pdPageContentStream.setLineWidth(lineWidth); // TODO remove
+            final float lineWidth = 0.3f; pdPageContentStream.setLineWidth(lineWidth);pdPageContentStream.setStrokingColor(background); // TODO remove
             //pdPageContentStream.setNonStrokingColor(background); // TODO add
-            pdPageContentStream.setStrokingColor(background); // TODO remove
             pdPageContentStream.addRect(getPdRectangle().getLowerLeftX(), getPdRectangle().getLowerLeftY(), getPdRectangle().getWidth(), getPdRectangle().getHeight());
             //pdPageContentStream.fill(); // TODO add
             pdPageContentStream.stroke();
             if(value != null && !value.isBlank())writeTextInRectangle(pdPageContentStream);
         }
+        for(Component component : getComponents()) component.render(pdPageContentStream);
 
     }
 }
