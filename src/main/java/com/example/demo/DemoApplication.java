@@ -147,8 +147,8 @@ public class DemoApplication  implements CommandLineRunner {
         Header header = Header.voidHeader(report,25f,Color.GRAY);
         for(int i=0;i<2;i+=2) {
             header.addCell(i, createCell(HorizontalAlign.left, "Continental", false));
-            header.addCell(i, createCell(HorizontalAlign.center, "ADIDAS provaciaolalallalalallaalal" +
-                    "alallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaala", true));
+            header.addCell(i, createCell(HorizontalAlign.center, "A D I D A S provaciaolalallalalallaalal" +
+                    "alallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalal allalalallaala", true));
             header.addCell(i, createCell(HorizontalAlign.right, "399$", false));
             header.addCell(i+1, createCell(HorizontalAlign.center, "oooooooooooo prova ciao", true));
         }

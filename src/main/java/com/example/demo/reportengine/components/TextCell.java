@@ -99,31 +99,54 @@ public class TextCell extends Component {
      */
     @Override
     public boolean build(float startX,float endY,float maxWidth,float minHeight) {
-        final int nCharsSubstitute = 3;
         if(minHeight < this.minHeight) throw new RuntimeException("TextCell height isn't sufficient.");
 
         String[] split = value.split("\\s+");
 
-        if (minWidth > maxWidth && split.length > 1) {
-
-            return buildAreaText(startX,endY,maxWidth,minHeight,split);
-        }
-
-        while (minWidth > maxWidth) { // TODO performance efficiency
-            setValue(value.substring(0, value.length() - nCharsSubstitute).replaceFirst(".{"+nCharsSubstitute+"}$", "..."));
+        if (minWidth > maxWidth) {
+            if (split.length > 1) return buildAreaText(startX,endY,maxWidth,minHeight,split);
+            setValue(shortens(value,maxWidth,fontType,fontSize));
         }
 
         setPdRectangle(new PDRectangle(startX,endY-minHeight,maxWidth,minHeight));
         return false;
     }
 
+    private String shortens(String value,float maxWidth,PDType1Font fontType,float fontSize) { // TODO inefficient performance
+        final int nCharsSubstitute = 3;
+        while (Utility.getWidth(value,fontType,fontSize) > maxWidth) {
+            value = value.substring(0, value.length() - nCharsSubstitute).replaceFirst(".{"+nCharsSubstitute+"}$", "...");
+        }
+        return value;
+    }
+
+    private String[] buildStringsWithMaxWidth(String[] split,float maxWidth,PDType1Font fontType,float fontSize) {
+        List<String> retValue = new ArrayList<>();
+        for (int i=0;i<split.length;i++) {
+            String value = split[i];
+            if (Utility.getWidth(value,fontType,fontSize) > maxWidth) {
+                value = shortens(value,maxWidth,fontType,fontSize);
+            } else {
+                for(int j=i+1;j<split.length;j++){
+                    if(Utility.getWidth(value+" "+split[j],fontType,fontSize) > maxWidth) break;
+                    value+=" "+split[j];
+                    i++;
+                }
+            }
+            retValue.add(value);
+        }
+        return retValue.toArray(new String[0]);
+    }
+
     private boolean buildAreaText(float startX,float endY,float maxWidth,float minHeight,String[] split) {
         List<TextCell> cells = new ArrayList<>();
         float tempHeight = minHeight/split.length;
         float height = (this.minHeight<tempHeight) ? tempHeight : this.minHeight;
-        for (int i=0;i<split.length;i++) {
+        String[] values = buildStringsWithMaxWidth(split,maxWidth,fontType,fontSize);
+
+        for (int i=0;i<values.length;i++) {
             TextCell temp = new TextCell(this);
-            temp.setValue(split[i]);
+            temp.setValue(values[i]);
             temp.setBackground(Color.PINK);
             //Return always false
             temp.build(startX,endY-i*height,maxWidth,height);
