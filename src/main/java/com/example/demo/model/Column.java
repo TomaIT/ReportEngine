@@ -1,6 +1,5 @@
 package com.example.demo.model;
 
-import com.example.demo.reportengine.components.Cell;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

@@ -2,31 +2,25 @@ package com.example.demo.reportengine.components;
 
 import com.example.demo.Utility;
 import com.example.demo.reportengine.Component;
+import com.example.demo.reportengine.components.properties.HorizontalAlign;
+import com.example.demo.reportengine.components.properties.VerticalAlign;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.util.Matrix;
 
 import java.awt.*;
 import java.io.IOException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class Cell extends Component {
-    @Setter(AccessLevel.NONE)
-    private static final float minMarginText = 2f;
-    @Setter(AccessLevel.NONE)
-    private static final float underlineWidthFactor = 0.03f;
-    @Setter(AccessLevel.NONE)
-    private static final float underlineMarginFactor = 0.08f;
+public class TextCell extends Component {
+    @Setter(AccessLevel.NONE) private static final float minMarginText = 2f;
+    @Setter(AccessLevel.NONE) private static final float underlineWidthFactor = 0.03f;
+    @Setter(AccessLevel.NONE) private static final float underlineMarginFactor = 0.08f;
     private String value = "";
     private HorizontalAlign horizontalAlign = HorizontalAlign.left;
     private VerticalAlign verticalAlign = VerticalAlign.center;
@@ -35,18 +29,13 @@ public class Cell extends Component {
     private boolean underline = false;
     private Color color = Color.BLACK;
     private Color background = Color.WHITE;
-    @Setter(AccessLevel.NONE)
-    private float minWidth;
-    @Setter(AccessLevel.NONE)
-    private float minHeight;
-    @Setter(AccessLevel.NONE)
-    private float textWidth;
-    @Setter(AccessLevel.NONE)
-    private float textHeight;
+    @Setter(AccessLevel.NONE) private float minWidth;
+    @Setter(AccessLevel.NONE) private float minHeight;
+    @Setter(AccessLevel.NONE) private float textWidth;
+    @Setter(AccessLevel.NONE) private float textHeight;
 
-    public Cell() { updateHeights();updateWidths(); }
-    public Cell(PDRectangle pdRectangle, Color borderColor) {
-        super(pdRectangle,borderColor);
+    public TextCell() {
+        super();
         updateHeights();
         updateWidths();
     }
@@ -61,7 +50,6 @@ public class Cell extends Component {
         textWidth = Utility.getWidth(value,fontType,fontSize);
         minWidth = textWidth + minMarginText*2;
     }
-
 
     public void setFontSize(float fontSize) {
         this.fontSize = fontSize;
@@ -82,18 +70,16 @@ public class Cell extends Component {
         updateHeights();
     }
 
-    /** //TODO change anche height :D
-     * Assume il testo in singola riga. Quindi se necessario riduce la fontSize, per farlo stare nello spazio dedicato.
-     * @return true se ha eseguito modifiche alla fontSize (quindi height and width), altrimenti false
-     */
-    public boolean changeFontSizeToBeauty(){
-        if (getPdRectangle().getWidth() < minWidth) {
-            try {
-                setFontSize((float) ((getPdRectangle().getWidth()-minMarginText*2)*1000.0/fontType.getStringWidth(value)));
-                return true;
-            } catch (Exception ignored) { }
+    @Override
+    public void build(float startX,float startY,float maxWidth,float minHeight) {
+        final int nCharsSubstitute = 3;
+        if(minHeight < this.minHeight) throw new RuntimeException("TextCell height isn't sufficient.");
+
+        while (minWidth > maxWidth) {
+            setValue(value.substring(0, value.length() - nCharsSubstitute).replaceFirst(".{"+nCharsSubstitute+"}$", "..."));
         }
-        return false;
+
+        setPdRectangle(new PDRectangle(startX,startY,maxWidth,minHeight));
     }
 
     private void writeTextInRectangle(PDPageContentStream pdPageContentStream) throws IOException {
@@ -129,6 +115,7 @@ public class Cell extends Component {
 
     @Override
     public void render(PDPageContentStream pdPageContentStream) throws IOException {
+        if(getPdRectangle()==null) throw new RuntimeException("Must be call build() before render.");
         final float lineWidth = 1.5f; pdPageContentStream.setLineWidth(lineWidth); // TODO remove
         //pdPageContentStream.setNonStrokingColor(background); // TODO add
         pdPageContentStream.setStrokingColor(background); // TODO remove

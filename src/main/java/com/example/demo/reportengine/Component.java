@@ -8,7 +8,6 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Data
@@ -68,6 +67,9 @@ public class Component {
         for(Component component : components) component.render(pdPageContentStream);
     }
 
+    public void build(float startX, float startY,float maxWidth,float minHeight){
+        throw new RuntimeException("Not Implemented");
+    }
 
 
     public boolean isOverlapped(Component component){

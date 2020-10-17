@@ -16,22 +16,22 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Header extends Component {
-    private static final double rowHeightFactor = 3f;
-    private List<List<Cell>> matrixValues = new ArrayList<>();
+    private static final double rowHeightFactor = 2.6f;
+    private List<List<TextCell>> matrixValues = new ArrayList<>();
 
     public Header() { super(); }
     public Header(PDRectangle pdRectangle, Color borderColor) {
         super(pdRectangle,borderColor);
     }
 
-    public void addCell(int nRow,Cell cell) {
-        checkOverlapping(cell);
+    public void addCell(int nRow, TextCell textCell) {
+        checkOverlapping(textCell);
         while (matrixValues.size() <= nRow) matrixValues.add(new ArrayList<>());
-        matrixValues.get(nRow).add(cell);
+        matrixValues.get(nRow).add(textCell);
     }
 
-    private float getMinHeightRow(List<Cell> row) {
-        return (float) (row.stream().mapToDouble(Cell::getMinHeight).max().orElse(0)*rowHeightFactor);
+    private float getMinHeightRow(List<TextCell> row) {
+        return (float) (row.stream().mapToDouble(TextCell::getMinHeight).max().orElse(0)*rowHeightFactor);
     }
 
     public float getMinHeight() {
@@ -47,21 +47,18 @@ public class Header extends Component {
     public void build() {
         float sumHeight = 0;
         for(int i=0;i<matrixValues.size();i++) {
-            List<Cell> row = matrixValues.get(i);
+            List<TextCell> row = matrixValues.get(i);
             if(row.size()<=0) throw new RuntimeException("Cell row is void");
-            //float minHeight = getMinHeightRow(row);
+            float minHeight = getMinHeightRow(row);
             float columnWidth = getPdRectangle().getWidth()/row.size();
             for(int j=0;j<row.size();j++) {
-                PDRectangle pdRectangle = new PDRectangle(
+                row.get(j).build(
                         getPdRectangle().getLowerLeftX()+j*columnWidth,
-                        getPdRectangle().getUpperRightY() - (float)matrixValues.stream().limit(i+1).mapToDouble(this::getMinHeightRow).sum(), // TODO perfomance improve
+                        getPdRectangle().getUpperRightY() - (float)matrixValues.stream().limit(i+1).mapToDouble(this::getMinHeightRow).sum(),
                         columnWidth,
-                        getMinHeightRow(row)); // TODO performanceImprove
-                row.get(j).setPdRectangle(pdRectangle);
-                row.get(j).setBorderColor(Color.PINK);
-                if (row.get(j).changeFontSizeToBeauty()) {
-                    j = -1;
-                }
+                        getMinHeightRow(row)
+
+                );
             }
             sumHeight += row.get(0).getPdRectangle().getHeight();
         }
@@ -86,7 +83,7 @@ public class Header extends Component {
         pdPageContentStream.stroke();
 
         for(Component component : this.getComponents()) component.render(pdPageContentStream);
-        for(List<Cell> row : matrixValues) for(Cell c : row) c.render(pdPageContentStream);
+        for(List<TextCell> row : matrixValues) for(TextCell c : row) c.render(pdPageContentStream);
     }
 
 
