@@ -24,8 +24,8 @@ public class TextCell extends Component {
     @Setter(AccessLevel.NONE) private static final float underlineWidthFactor = 0.03f;
     @Setter(AccessLevel.NONE) private static final float underlineMarginFactor = 0.08f;
     private String value = "";
-    private HorizontalAlign horizontalAlign = HorizontalAlign.left;
-    private VerticalAlign verticalAlign = VerticalAlign.top;
+    private HorizontalAlign horizontalAlign = HorizontalAlign.center;
+    private VerticalAlign verticalAlign = VerticalAlign.center;
     private PDType1Font fontType = PDType1Font.HELVETICA;
     private float fontSize = 12f;
     private boolean underline = false;
@@ -148,7 +148,7 @@ public class TextCell extends Component {
 
     @Override
     public void render(PDPageContentStream pdPageContentStream) throws IOException {
-        //if(getPdRectangle()==null) throw new RuntimeException("Must be call build() before render.");
+        if(getPdRectangle()==null) throw new RuntimeException("Must be call build() before render.");
 
         if(getPdRectangle()!=null) {
             final float lineWidth = 0.3f; pdPageContentStream.setLineWidth(lineWidth);pdPageContentStream.setStrokingColor(background); // TODO remove
