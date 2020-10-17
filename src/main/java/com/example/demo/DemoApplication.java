@@ -142,12 +142,12 @@ public class DemoApplication  implements CommandLineRunner {
         Utility.startTimer("TOTAL");
         //new PDFTableGenerator().generatePDF(createContent(10,9,12),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
 
-        Report report = new Report(PDRectangle.A4,25,25,25,25);
+        Report report = new Report(PDRectangle.A4,50,50,50,50);
 
         Header header = Header.voidHeader(report,25f,Color.GRAY);
         for(int i=0;i<2;i+=2) {
             header.addCell(i, createCell(HorizontalAlign.left, "Continental", false));
-            header.addCell(i, createCell(HorizontalAlign.center, "ADIDAS prova ciao lalallalalallaalal" +
+            header.addCell(i, createCell(HorizontalAlign.center, "ADIDAS provaciaolalallalalallaalal" +
                     "alallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalalallalalallaala", true));
             header.addCell(i, createCell(HorizontalAlign.right, "399$", false));
             header.addCell(i+1, createCell(HorizontalAlign.center, "oooooooooooo prova ciao", true));
@@ -156,11 +156,11 @@ public class DemoApplication  implements CommandLineRunner {
 
         header.build();
 
-        report.setFooter(Footer.voidFooter(report,3f,Utility.hex2Rgb("#fe9200")));
+        report.setFooter(Footer.voidFooter(report,25f,Utility.hex2Rgb("#fe9200")));
         report.setHeaderInAllPages(header);//Header.voidHeader(report,50f,Color.RED));
 
         report.addPage(Color.BLACK);
-        report.getPages().get(0).addComponent(new Component(new PDRectangle(25,250,report.getMediaBoxPage().getWidth(),11.3f),Color.CYAN));
+        report.getPages().get(0).addComponent(new Component(new PDRectangle(50,250,report.getMediaBoxPage().getWidth(),11.3f),Color.CYAN));
         report.getPages().get(0).addComponent(new Component(report.getPages().get(0).getFirstVoidSpace(),Color.GREEN));
         report.getPages().get(0).addComponent(new Component(report.getPages().get(0).getFirstVoidSpace(),Color.MAGENTA));
         report.addPage(Color.BLACK);

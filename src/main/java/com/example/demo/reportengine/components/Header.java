@@ -2,8 +2,10 @@ package com.example.demo.reportengine.components;
 
 import com.example.demo.reportengine.Component;
 import com.example.demo.reportengine.Report;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Setter;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
@@ -16,7 +18,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Header extends Component {
-    private static final double rowHeightFactor = 2.6f;
+    @Setter(AccessLevel.NONE) private static final float rowMinMargin = 2f;
     private List<List<TextCell>> matrixValues = new ArrayList<>();
 
     public Header() { super(); }
@@ -31,7 +33,7 @@ public class Header extends Component {
     }
 
     private float getMinHeightRow(List<TextCell> row) {
-        return (float) (row.stream().mapToDouble(TextCell::getMinHeight).max().orElse(0)*rowHeightFactor);
+        return (float) (row.stream().mapToDouble(TextCell::getMinHeight).max().orElse(0)+rowMinMargin);
     }
 
     public float getMinHeight() {
@@ -52,13 +54,12 @@ public class Header extends Component {
             float minHeight = getMinHeightRow(row);
             float columnWidth = getPdRectangle().getWidth()/row.size();
             for(int j=0;j<row.size();j++) {
-                row.get(j).build(
+                if(row.get(j).build(
                         getPdRectangle().getLowerLeftX()+j*columnWidth,
-                        getPdRectangle().getUpperRightY() - (float)matrixValues.stream().limit(i+1).mapToDouble(this::getMinHeightRow).sum(),
+                        getPdRectangle().getUpperRightY() - (float)matrixValues.stream().limit(i).mapToDouble(this::getMinHeightRow).sum(),
                         columnWidth,
                         getMinHeightRow(row)
-
-                );
+                )){j=-1;}
             }
             sumHeight += row.get(0).getPdRectangle().getHeight();
         }
@@ -76,7 +77,7 @@ public class Header extends Component {
 
     @Override
     public void render(PDPageContentStream pdPageContentStream) throws IOException {
-        final float lineWidth = 1.5f;
+        final float lineWidth = 0.3f;
         pdPageContentStream.setLineWidth(lineWidth);
         pdPageContentStream.setStrokingColor(this.getBorderColor());
         pdPageContentStream.addRect(this.getPdRectangle().getLowerLeftX(), this.getPdRectangle().getLowerLeftY(), this.getPdRectangle().getWidth(), this.getPdRectangle().getHeight());

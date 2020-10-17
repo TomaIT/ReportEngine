@@ -1,7 +1,6 @@
 package com.example.demo.reportengine;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
@@ -9,13 +8,28 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
 public class Component {
     private PDRectangle pdRectangle;
     private Color borderColor = Color.BLACK;
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
     private List<Component> components = new ArrayList<>();
+
+    public Component(Component component) {
+        if(component.pdRectangle != null) {
+            this.pdRectangle = new PDRectangle(
+                    component.pdRectangle.getLowerLeftX(),
+                    component.pdRectangle.getLowerLeftY(),
+                    component.pdRectangle.getWidth(),
+                    component.pdRectangle.getHeight());
+        }
+        this.borderColor = component.borderColor;
+        this.components = component.components.stream().map(Component::new).collect(Collectors.toList());
+    }
 
     public Component(PDRectangle pdRectangle, Color borderColor){
         this.pdRectangle = pdRectangle;
@@ -57,8 +71,10 @@ public class Component {
         return null;
     }
 
+    protected List<Component> getComponents(){return components;}
+
     public void render(PDPageContentStream pdPageContentStream) throws IOException {
-        final float lineWidth = 1.5f;
+        final float lineWidth = 0.3f;
         pdPageContentStream.setLineWidth(lineWidth);
         pdPageContentStream.setStrokingColor(borderColor);
         pdPageContentStream.addRect(pdRectangle.getLowerLeftX(), pdRectangle.getLowerLeftY(), pdRectangle.getWidth(), pdRectangle.getHeight());
@@ -67,7 +83,15 @@ public class Component {
         for(Component component : components) component.render(pdPageContentStream);
     }
 
-    public void build(float startX, float startY,float maxWidth,float minHeight){
+    /**
+     *
+     * @param startX
+     * @param endY
+     * @param maxWidth
+     * @param minHeight
+     * @return true se ha aumentato la height rispetto a minHeight, altrimenti false
+     */
+    public boolean build(float startX, float endY,float maxWidth,float minHeight){
         throw new RuntimeException("Not Implemented");
     }
 
