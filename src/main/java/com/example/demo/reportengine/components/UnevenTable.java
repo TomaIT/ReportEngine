@@ -13,7 +13,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class UnevenTable extends Component {
-    @Setter(AccessLevel.NONE) private static final float rowMinMargin = 2f;
+    @Setter(AccessLevel.NONE) private static final float rowMinMargin = 15f;
     @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE) private Component[][] table;
 
     public UnevenTable(Component[][] table) {

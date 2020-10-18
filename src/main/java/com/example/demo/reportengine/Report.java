@@ -45,9 +45,9 @@ public class Report {
     }
 
 
-    public void addPage(Color borderColor) throws OverlappingException {
+    public void addPage() throws OverlappingException {
         if(header == null || footer == null) throw new RuntimeException("Please before call addPage() set header & footer");
-        Component page = new Component(mediaBoxPage,true, borderColor);
+        Component page = new Component(mediaBoxPage);
         if(headerInAllPages || pages.size()<=0) page.addComponent(header);
         if(footerInAllPages || pages.size()<=0) page.addComponent(footer);
         pages.add(page);

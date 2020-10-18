@@ -63,7 +63,7 @@ public class TextCell extends Component {
         this.fontType = fontType;
         this.fontSize = fontSize;
         this.underline = underline;
-        this.textColor = textColor;
+        this.textColor = textColor == null ? Color.BLACK : textColor;
         updateHeights();
         updateWidths();
     }

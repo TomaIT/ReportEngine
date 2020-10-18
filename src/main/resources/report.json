@@ -6,35 +6,6 @@
     "margintop": 25,
     "marginbottom": 25
   },
-  "parameters": [],
-  "content": [
-    {
-      "id": "aba080c8-84a8-4056-af6b-f72f5e5e2937",
-      "label": "Table",
-      "type": "table",
-      "mapping": "",
-      "maxrows": -1,
-      "cols": [
-        {
-          "value": "$crmcliente_1.aziendanome",
-          "headervalue": "Azienda"
-        },
-        {
-          "headervalue": "Fatturato",
-          "value": "$crmcliente_1.fatturato"
-        }
-      ],
-      "conditions": [
-        {
-          "attribute": "fatturato",
-          "operator": ">",
-          "value": "5000",
-          "gate": ""
-        }
-      ],
-      "querysource": "crmcliente"
-    }
-  ],
   "header": {
     "rows": [
       {

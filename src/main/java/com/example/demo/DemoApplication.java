@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import com.example.demo.exceptions.OverlappingException;
+import com.example.demo.model.ReportJSON;
 import com.example.demo.reportengine.Component;
 import com.example.demo.reportengine.Report;
 import com.example.demo.reportengine.components.Footer;
@@ -9,6 +11,7 @@ import com.example.demo.reportengine.components.UnevenTable;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;
 import com.example.demo.reportengine.components.properties.VerticalAlign;
 import com.example.demo.table.Table;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
@@ -23,6 +26,8 @@ import org.thymeleaf.context.Context;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -165,6 +170,14 @@ public class DemoApplication  implements CommandLineRunner {
         return temp;
     }
 
+    private static void tryByReportJSON() throws IOException, OverlappingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ReportJSON reportJSON = objectMapper.readValue(new File("src/main/resources/report.json"), ReportJSON.class);
+        System.out.println(reportJSON);
+        Report report = reportJSON.build();
+        report.render().save("src/main/resources/prove/byJSON_"+System.currentTimeMillis()+".pdf");
+    }
+
     @Override
     public void run(String... args) throws Exception {
         /*Report report = new ObjectMapper().readValue(
@@ -177,11 +190,13 @@ public class DemoApplication  implements CommandLineRunner {
         //System.out.println("HTML-DONE");
 
         Utility.startTimer("TOTAL");
+        tryByReportJSON();
         //new PDFTableGenerator().generatePDF(createContent(10,9,12),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
         //prova();
-        Report report = new Report(PDRectangle.A4,50,50,50,50);
+        //Report report = new Report(PDRectangle.A4,50,50,50,50);
 
-        UnevenTable header = new UnevenTable(header(),Color.RED,null);/*Header.voidHeader(report,25f,Color.GRAY);
+        //UnevenTable header = new UnevenTable(header(),Color.RED,null);
+        /*Header.voidHeader(report,25f,Color.GRAY);
         for(int i=0;i<2;i+=2) {
             header.addCell(i, );
             header.addCell(i, );
@@ -190,7 +205,7 @@ public class DemoApplication  implements CommandLineRunner {
         }*/
 
 
-        header.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getUpperRightY(),report.getMediaBoxPage().getWidth(),2f);
+        /*header.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getUpperRightY(),report.getMediaBoxPage().getWidth(),2f);
 
         report.setFooter(Footer.voidFooter(report,25f,Utility.hex2Rgb("#fe9200")));
         report.setHeaderInAllPages(header);//Header.voidHeader(report,50f,Color.RED));
@@ -208,7 +223,7 @@ public class DemoApplication  implements CommandLineRunner {
         report.render().save("src/main/resources/prove/components_"+System.currentTimeMillis()+".pdf");
 
         //report.getPages().forEach(x->System.out.println(x.getFirstVoidSpace()));
-
+*/
         Utility.stopTimer("TOTAL");
 
         Utility.printTimers();
