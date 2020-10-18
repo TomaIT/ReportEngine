@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Performance: 1M textCell -> (Constructor and Building in single Thread): 6 seconds
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class TextCell extends Component {
@@ -54,20 +57,19 @@ public class TextCell extends Component {
         updateHeights();
         updateWidths();
     }
-
-    private void updateHeights() {
-        textHeight = (value == null || value.isBlank()) ? 0 : Utility.getHeight(fontType,fontSize);
-        minHeight = (getPdRectangle() != null) ?
-                getPdRectangle().getHeight() :
-                (underline) ?
-                        textHeight + minMarginText*2 + (fontSize*underlineWidthFactor) + (fontSize*underlineMarginFactor) :
-                        textHeight + minMarginText*2;
-    }
-    private void updateWidths() {
-        textWidth = (value == null || value.isBlank()) ? 0 : Utility.getWidth(value,fontType,fontSize);
-        minWidth = (getPdRectangle() != null) ?
-                getPdRectangle().getWidth() :
-                textWidth + minMarginText*2;
+    public TextCell(String value, HorizontalAlign horizontalAlign, VerticalAlign verticalAlign, PDType1Font fontType,
+                    float fontSize, boolean underline, Color color, Color background) {
+        super();
+        this.value = value;
+        this.horizontalAlign = horizontalAlign;
+        this.verticalAlign = verticalAlign;
+        this.fontType = fontType;
+        this.fontSize = fontSize;
+        this.underline = underline;
+        this.color = color;
+        this.background = background;
+        updateHeights();
+        updateWidths();
     }
 
     public void setFontSize(float fontSize) {
@@ -160,6 +162,22 @@ public class TextCell extends Component {
         }
         for(Component component : getComponents()) component.render(pdPageContentStream);
 
+    }
+
+
+    private void updateHeights() {
+        textHeight = (value == null || value.isBlank()) ? 0 : Utility.getHeight(fontType,fontSize);
+        minHeight = (getPdRectangle() != null) ?
+                getPdRectangle().getHeight() :
+                (underline) ?
+                        textHeight + minMarginText*2 + (fontSize*underlineWidthFactor) + (fontSize*underlineMarginFactor) :
+                        textHeight + minMarginText*2;
+    }
+    private void updateWidths() {
+        textWidth = (value == null || value.isBlank()) ? 0 : Utility.getWidth(value,fontType,fontSize);
+        minWidth = (getPdRectangle() != null) ?
+                getPdRectangle().getWidth() :
+                textWidth + minMarginText*2;
     }
 
     private String shortens(String value,float maxWidth,PDType1Font fontType,float fontSize) { // TODO inefficient performance

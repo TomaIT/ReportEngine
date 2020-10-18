@@ -18,7 +18,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Header extends Component {
-    @Setter(AccessLevel.NONE) private static final float rowMinMargin = 20f;
+    @Setter(AccessLevel.NONE) private static final float rowMinMargin = 2f;
     private List<List<TextCell>> matrixValues = new ArrayList<>();
 
     public Header() { super(); }

@@ -6,6 +6,7 @@ import com.example.demo.reportengine.components.Footer;
 import com.example.demo.reportengine.components.Header;
 import com.example.demo.reportengine.components.TextCell;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;
+import com.example.demo.reportengine.components.properties.VerticalAlign;
 import com.example.demo.table.Table;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -121,7 +122,10 @@ public class DemoApplication  implements CommandLineRunner {
     }
 
     private static TextCell createCell(HorizontalAlign align, String text, boolean underline) {
-        TextCell textCell = new TextCell();
+        //6218-5000
+        return new TextCell(text,align, VerticalAlign.center,PDType1Font.HELVETICA,12f,true,Color.BLUE,Color.MAGENTA);
+
+        /*TextCell textCell = new TextCell();
         textCell.setBackground(Color.CYAN);
         textCell.setColor(Utility.hex2Rgb("#000000"));
         textCell.setValue(text);
@@ -129,7 +133,23 @@ public class DemoApplication  implements CommandLineRunner {
         textCell.setHorizontalAlign(align);
         //cell.setVerticalAlign(VerticalAlign.bottom);
         textCell.setFontType(PDType1Font.COURIER);
-        return textCell;
+        return textCell;*/
+    }
+
+    private static void prova(){
+        final int nRow = 100000;
+        final int nCol = 10;
+        List<TextCell> cells = new ArrayList<>(nRow*nCol);
+        long start = System.currentTimeMillis();
+        for(int i=0;i<nRow;i++){
+            for(int j=0;j<nCol;j++){
+                cells.add(createCell(HorizontalAlign.center,"lala",true));
+            }
+        }
+
+        cells.stream().forEach(x->x.build(0,0,25,250));
+        System.out.println(System.currentTimeMillis()-start);
+
     }
 
     @Override
@@ -145,7 +165,7 @@ public class DemoApplication  implements CommandLineRunner {
 
         Utility.startTimer("TOTAL");
         //new PDFTableGenerator().generatePDF(createContent(10,9,12),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
-
+        prova();
         Report report = new Report(PDRectangle.A4,50,50,50,50);
 
         Header header = Header.voidHeader(report,25f,Color.GRAY);
