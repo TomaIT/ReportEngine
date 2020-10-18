@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import com.example.demo.reportengine.Component;
 import com.example.demo.table.PDFTableGenerator;
 import com.example.demo.table.Table;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -11,11 +10,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.awt.*;
 import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class DemoApplicationTests {

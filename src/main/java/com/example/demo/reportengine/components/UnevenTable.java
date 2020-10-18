@@ -8,7 +8,6 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import java.awt.*;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

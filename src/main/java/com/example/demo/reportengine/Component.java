@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class Component {
     @Setter(AccessLevel.NONE) private static final float borderLineWidth = 0.5f;
     private PDRectangle pdRectangle = null;
-    private boolean bordered = true;
+    private boolean bordered = false;
     private Color borderColor = Color.BLACK;
     private boolean filled = false;
     private Color backgroundColor = Color.WHITE;

@@ -5,9 +5,6 @@ import com.example.demo.reportengine.Report;
 import com.example.demo.reportengine.components.UnevenTable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
