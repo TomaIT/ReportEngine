@@ -1,5 +1,6 @@
 package com.example.demo.reportengine;
 
+import com.example.demo.exceptions.OverlappingException;
 import lombok.*;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -13,11 +14,17 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 public class Component {
-    private PDRectangle pdRectangle;
+    @Setter(AccessLevel.NONE) private static final float borderLineWidth = 0.5f;
+    private PDRectangle pdRectangle = null;
+    private boolean bordered = true;
     private Color borderColor = Color.BLACK;
+    private boolean filled = false;
+    private Color backgroundColor = Color.WHITE;
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private List<Component> components = new ArrayList<>();
+    @Setter(AccessLevel.NONE) protected float minWidth;
+    @Setter(AccessLevel.NONE) protected float minHeight;
 
     public Component(Component component) {
         if(component.pdRectangle != null) {
@@ -27,16 +34,41 @@ public class Component {
                     component.pdRectangle.getWidth(),
                     component.pdRectangle.getHeight());
         }
+        this.bordered = component.bordered;
         this.borderColor = component.borderColor;
+        this.filled = component.filled;
+        this.backgroundColor = component.backgroundColor;
+        this.minWidth = component.minWidth;
+        this.minHeight = component.minHeight;
         this.components = component.components.stream().map(Component::new).collect(Collectors.toList());
     }
-
-    public Component(PDRectangle pdRectangle, Color borderColor){
+    public Component(float startX,float startY,float width,float height){
+        this.pdRectangle = new PDRectangle(startX,startY,width,height);
+    }
+    public Component(PDRectangle pdRectangle){
         this.pdRectangle = pdRectangle;
+    }
+    public Component(PDRectangle pdRectangle, boolean bordered, Color borderColor){
+        this.pdRectangle = pdRectangle;
+        this.bordered = bordered;
         this.borderColor = borderColor;
     }
+    public Component(PDRectangle pdRectangle, boolean bordered, Color borderColor,boolean filled,Color backgroundColor){
+        this.pdRectangle = pdRectangle;
+        this.bordered = bordered;
+        this.borderColor = borderColor;
+        this.filled = filled;
+        this.backgroundColor = backgroundColor;
+    }
+    public Component(boolean bordered, Color borderColor,boolean filled,Color backgroundColor){
+        this.bordered = bordered;
+        this.borderColor = borderColor;
+        this.filled = filled;
+        this.backgroundColor = backgroundColor;
+    }
 
-    public void addComponent(Component component){
+
+    public void addComponent(Component component) throws OverlappingException {
         checkOverlapping(component);
         components.add(component);
     }
@@ -50,36 +82,50 @@ public class Component {
     public PDRectangle getFirstVoidSpace(){
         float width = pdRectangle.getWidth(); // Assumption is immutable
         float x = pdRectangle.getLowerLeftX(); // Assumption is immutable
-
+        System.out.println("A "+getPdRectangle().getUpperRightY()+" "+getPdRectangle().getLowerLeftY());
         if(components.size() <= 0) return new PDRectangle(x,pdRectangle.getLowerLeftY(),width,pdRectangle.getWidth());
-
+System.out.println("B");
         components.sort((a,b)-> Double.compare(b.getPdRectangle().getUpperRightY(), a.getPdRectangle().getUpperRightY()));
+        components.forEach(y->System.out.println(y.getPdRectangle().getUpperRightY()+" "+y.getPdRectangle().getLowerLeftY()));
 
         float height = pdRectangle.getUpperRightY() - components.get(0).pdRectangle.getUpperRightY();
 
         if(height > 0f) return new PDRectangle(x,components.get(0).pdRectangle.getUpperRightY(),width,height);
-
+        System.out.println("C");
         for (int i=1;i<components.size();i++) {
             height = components.get(i-1).pdRectangle.getLowerLeftY() - components.get(i).pdRectangle.getUpperRightY();
+            System.out.println(height);
             if(height > 0f) return new PDRectangle(x,components.get(i).pdRectangle.getUpperRightY(),width,height);
         }
+        System.out.println("D");
 
         height = components.get(components.size()-1).pdRectangle.getLowerLeftY() - pdRectangle.getLowerLeftY();
 
         if(height > 0f) return new PDRectangle(x,pdRectangle.getLowerLeftY(),width,height);
+        System.out.println("E");
 
         return null;
     }
 
     protected List<Component> getComponents(){return components;}
 
-    public void render(PDPageContentStream pdPageContentStream) throws IOException {
-        final float lineWidth = 0.3f;
-        pdPageContentStream.setLineWidth(lineWidth);
-        pdPageContentStream.setStrokingColor(borderColor);
-        pdPageContentStream.addRect(pdRectangle.getLowerLeftX(), pdRectangle.getLowerLeftY(), pdRectangle.getWidth(), pdRectangle.getHeight());
-        pdPageContentStream.stroke();
+    protected void renderWithoutComponents(PDPageContentStream pdPageContentStream) throws IOException {
+        if (pdRectangle==null) throw new RuntimeException("Must be call build() before render.");
+        if (filled || bordered) {
+            if (bordered) {
+                pdPageContentStream.setLineWidth(borderLineWidth);
+                pdPageContentStream.setStrokingColor(borderColor);
+            }
+            if (filled) pdPageContentStream.setNonStrokingColor(backgroundColor);
+            pdPageContentStream.addRect(pdRectangle.getLowerLeftX(), pdRectangle.getLowerLeftY(), pdRectangle.getWidth(), pdRectangle.getHeight());
+            if (filled && bordered) pdPageContentStream.fillAndStroke();
+            else if(filled) pdPageContentStream.fill();
+            else pdPageContentStream.stroke();
+        }
+    }
 
+    public void render(PDPageContentStream pdPageContentStream) throws IOException {
+        renderWithoutComponents(pdPageContentStream);
         for(Component component : components) component.render(pdPageContentStream);
     }
 
@@ -104,9 +150,8 @@ public class Component {
                 pdRectangle.getUpperRightY() > component.pdRectangle.getLowerLeftY();
     }
 
-    public void checkOverlapping(Component component){
-        if(components.stream().anyMatch(x->x.isOverlapped(component))) {
-            throw new RuntimeException("Component is overlapped with other Component");
-        }
+    public void checkOverlapping(Component component) throws OverlappingException {
+        if(components.stream().anyMatch(x->x.isOverlapped(component)))
+            throw new OverlappingException("Component is overlapped with other Component");
     }
 }

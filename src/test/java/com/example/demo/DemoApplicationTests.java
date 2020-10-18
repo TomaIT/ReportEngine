@@ -68,23 +68,6 @@ class DemoApplicationTests {
         Utility.printTimers();
     }
 
-    @Test
-    void testOverlapComponents() throws IOException {
-        Component a = new Component(new PDRectangle(0,0,2,2), Color.BLACK);
-        Component b = new Component(new PDRectangle(1,1,2,2), Color.BLACK);
-        Component c = new Component(new PDRectangle(2,2,2,2), Color.BLACK);
-        Component d = new Component(new PDRectangle(0,0,1,1), Color.BLACK);
 
-        assertTrue(a.isOverlapped(b));assertTrue(b.isOverlapped(a));
-
-        assertFalse(a.isOverlapped(c));assertFalse(c.isOverlapped(a));
-
-        assertTrue(b.isOverlapped(c));assertTrue(c.isOverlapped(b));
-
-        assertTrue(a.isOverlapped(d));assertTrue(d.isOverlapped(a));
-        assertFalse(b.isOverlapped(d));assertFalse(d.isOverlapped(b));
-        assertFalse(c.isOverlapped(d));assertFalse(d.isOverlapped(c));
-
-    }
 
 }

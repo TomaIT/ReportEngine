@@ -1,5 +1,6 @@
 package com.example.demo.reportengine;
 
+import com.example.demo.exceptions.OverlappingException;
 import lombok.Data;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -44,9 +45,9 @@ public class Report {
     }
 
 
-    public void addPage(Color borderColor){
+    public void addPage(Color borderColor) throws OverlappingException {
         if(header == null || footer == null) throw new RuntimeException("Please before call addPage() set header & footer");
-        Component page = new Component(mediaBoxPage, borderColor);
+        Component page = new Component(mediaBoxPage,true, borderColor);
         if(headerInAllPages || pages.size()<=0) page.addComponent(header);
         if(footerInAllPages || pages.size()<=0) page.addComponent(footer);
         pages.add(page);

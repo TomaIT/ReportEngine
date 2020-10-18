@@ -5,6 +5,7 @@ import com.example.demo.reportengine.Report;
 import com.example.demo.reportengine.components.Footer;
 import com.example.demo.reportengine.components.Header;
 import com.example.demo.reportengine.components.TextCell;
+import com.example.demo.reportengine.components.UnevenTable;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;
 import com.example.demo.reportengine.components.properties.VerticalAlign;
 import com.example.demo.table.Table;
@@ -123,7 +124,7 @@ public class DemoApplication  implements CommandLineRunner {
 
     private static TextCell createCell(HorizontalAlign align, String text, boolean underline) {
         //6218-5000
-        return new TextCell(text,align, VerticalAlign.center,PDType1Font.HELVETICA,12f,true,Color.BLUE,Color.MAGENTA);
+        return new TextCell(text,align, VerticalAlign.center,PDType1Font.HELVETICA,12f,underline,Color.MAGENTA,Color.BLACK,null);
 
         /*TextCell textCell = new TextCell();
         textCell.setBackground(Color.CYAN);
@@ -147,9 +148,21 @@ public class DemoApplication  implements CommandLineRunner {
             }
         }
 
-        cells.stream().forEach(x->x.build(0,0,25,250));
+        cells.forEach(x->x.build(0,0,25,250));
         System.out.println(System.currentTimeMillis()-start);
 
+    }
+
+    private static Component[][] header(){
+        Component[][] temp = new Component[2][];
+        temp[0]=new Component[3];
+        temp[1]=new Component[1];
+        temp[0][0]=createCell(HorizontalAlign.left, "Continental", false);
+        temp[0][1]=createCell(HorizontalAlign.center, "A D I D A S prova ciao lalallalalallaalal" +
+                "alallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalal allalalallaala", true);
+        temp[0][2]=createCell(HorizontalAlign.right, "399$", false);
+        temp[1][0]=createCell(HorizontalAlign.center, "oooooooooooo prova ciao", true);
+        return temp;
     }
 
     @Override
@@ -165,35 +178,36 @@ public class DemoApplication  implements CommandLineRunner {
 
         Utility.startTimer("TOTAL");
         //new PDFTableGenerator().generatePDF(createContent(10,9,12),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
-        prova();
+        //prova();
         Report report = new Report(PDRectangle.A4,50,50,50,50);
 
-        Header header = Header.voidHeader(report,25f,Color.GRAY);
+        UnevenTable header = new UnevenTable(header(),Color.RED,null);/*Header.voidHeader(report,25f,Color.GRAY);
         for(int i=0;i<2;i+=2) {
-            header.addCell(i, createCell(HorizontalAlign.left, "Continental", false));
-            header.addCell(i, createCell(HorizontalAlign.center, "A D I D A S prova ciao lalallalalallaalal" +
-                    "alallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalal allalalallaala", true));
-            header.addCell(i, createCell(HorizontalAlign.right, "399$", false));
-            header.addCell(i+1, createCell(HorizontalAlign.center, "oooooooooooo prova ciao", true));
-        }
+            header.addCell(i, );
+            header.addCell(i, );
+            header.addCell(i, );
+            header.addCell(i+1, );
+        }*/
 
 
-        header.build();
+        header.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getUpperRightY(),report.getMediaBoxPage().getWidth(),2f);
 
         report.setFooter(Footer.voidFooter(report,25f,Utility.hex2Rgb("#fe9200")));
         report.setHeaderInAllPages(header);//Header.voidHeader(report,50f,Color.RED));
 
         report.addPage(Color.BLACK);
-        report.getPages().get(0).addComponent(new Component(new PDRectangle(50,250,report.getMediaBoxPage().getWidth(),11.3f),Color.CYAN));
-        report.getPages().get(0).addComponent(new Component(report.getPages().get(0).getFirstVoidSpace(),Color.GREEN));
-        report.getPages().get(0).addComponent(new Component(report.getPages().get(0).getFirstVoidSpace(),Color.MAGENTA));
+        report.getPages().get(0).addComponent(new Component(new PDRectangle(50,250,report.getMediaBoxPage().getWidth(),11.3f),true,Color.MAGENTA,true,Color.GREEN));
+        System.out.println("START");
+        report.getPages().get(0).addComponent(new Component(report.getPages().get(0).getFirstVoidSpace(),true,Color.GREEN));
+        System.out.println("END");
+        //report.getPages().get(0).addComponent(new Component(report.getPages().get(0).getFirstVoidSpace(),true,Color.MAGENTA));
         report.addPage(Color.BLACK);
 
-        report.getPages().get(1).addComponent(new Component(report.getPages().get(1).getFirstVoidSpace(),Color.GREEN));
+        //report.getPages().get(1).addComponent(new Component(report.getPages().get(1).getFirstVoidSpace(),true,Color.GREEN));
         report.addPage(Color.BLACK);
         report.render().save("src/main/resources/prove/components_"+System.currentTimeMillis()+".pdf");
 
-        report.getPages().forEach(x->System.out.println(x.getFirstVoidSpace()));
+        //report.getPages().forEach(x->System.out.println(x.getFirstVoidSpace()));
 
         Utility.stopTimer("TOTAL");
 

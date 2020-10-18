@@ -12,7 +12,7 @@ import java.awt.*;
 @Data
 public class Footer extends Component {
     public Footer(PDRectangle pdRectangle, Color borderColor) {
-        super(pdRectangle,borderColor);
+        super(pdRectangle,true,borderColor);
     }
 
     public static Footer voidFooter(Report report, float height, Color borderColor) {

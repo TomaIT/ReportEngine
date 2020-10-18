@@ -23,7 +23,7 @@ public class Header extends Component {
 
     public Header() { super(); }
     public Header(PDRectangle pdRectangle, Color borderColor) {
-        super(pdRectangle,borderColor);
+        super(pdRectangle,true,borderColor);
     }
 
     public void addCell(int nRow, TextCell textCell) {
