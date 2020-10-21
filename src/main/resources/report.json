@@ -87,7 +87,7 @@
             "value": "Page: #currentpage / #totalpages",
             "align": "center",
             "fontfamily": "Arial",
-            "fontsize": "15px"
+            "fontsize": "12px"
           }
         ]
       }

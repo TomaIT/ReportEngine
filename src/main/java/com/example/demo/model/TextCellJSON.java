@@ -47,7 +47,9 @@ public class TextCellJSON {
 
     public PDFont getPDFont() {
         if(fontfamily==null || fontfamily.isBlank()) return PDType1Font.HELVETICA;
-        return FontService.findFont(fontfamily);
+        PDFont pdFont = FontService.findFont(fontfamily);
+        System.out.println(pdFont);
+        return pdFont;
     }
 
     public float getFontSize() {
