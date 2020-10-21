@@ -12,6 +12,12 @@ public class Metadata {
     private float marginright;
     private float margintop;
     private float marginbottom;
+    private boolean headerfirstpage;
+    private boolean footerfirstpage;
+    private boolean footercontentpage;
+    private boolean headercontentpage;
+    private boolean headerlastpage;
+    private boolean footerlastpage;
 
     public PDRectangle getFormat() {
         switch (format) {

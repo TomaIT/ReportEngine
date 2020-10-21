@@ -1,7 +1,7 @@
 package com.example.demo.reportengine.components;
 
-import com.example.demo.Utility;
 import com.example.demo.reportengine.Component;
+import com.example.demo.reportengine.FontService;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;
 import com.example.demo.reportengine.components.properties.VerticalAlign;
 import lombok.AccessLevel;
@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.awt.*;
@@ -29,7 +30,7 @@ public class TextCell extends Component {
     private String value = "";
     private HorizontalAlign horizontalAlign = HorizontalAlign.center;
     private VerticalAlign verticalAlign = VerticalAlign.center;
-    private PDType1Font fontType = PDType1Font.HELVETICA;
+    private PDFont fontType = PDType1Font.HELVETICA;
     private float fontSize = 12f;
     private boolean underline = false;
     private Color textColor = Color.BLACK;
@@ -54,7 +55,7 @@ public class TextCell extends Component {
         updateHeights();
         updateWidths();
     }
-    public TextCell(String value, HorizontalAlign horizontalAlign, VerticalAlign verticalAlign, PDType1Font fontType,
+    public TextCell(String value, HorizontalAlign horizontalAlign, VerticalAlign verticalAlign, PDFont fontType,
                     float fontSize, boolean underline, Color borderColor, Color textColor, Color backgroundColor) {
         super(borderColor!=null,borderColor,backgroundColor!=null,backgroundColor);
         this.value = value;
@@ -77,7 +78,7 @@ public class TextCell extends Component {
         this.value = value;
         updateWidths();
     }
-    public void setFontType(PDType1Font fontType) {
+    public void setFontType(PDFont fontType) {
         this.fontType = fontType;
         updateWidths();
         updateHeights();
@@ -188,7 +189,7 @@ public class TextCell extends Component {
 
 
     private void updateHeights() {
-        textHeight = (value == null || value.isBlank()) ? 0 : Utility.getHeight(fontType,fontSize);
+        textHeight = (value == null || value.isBlank()) ? 0 : FontService.getHeight(fontType,fontSize);
         minHeight = (getPdRectangle() != null) ?
                 getPdRectangle().getHeight() :
                 (underline) ?
@@ -196,29 +197,29 @@ public class TextCell extends Component {
                         textHeight + minMarginText*2;
     }
     private void updateWidths() {
-        textWidth = (value == null || value.isBlank()) ? 0 : Utility.getWidth(value,fontType,fontSize);
+        textWidth = (value == null || value.isBlank()) ? 0 : FontService.getWidth(value,fontType,fontSize);
         minWidth = (getPdRectangle() != null) ?
                 getPdRectangle().getWidth() :
                 textWidth + minMarginText*2;
     }
 
-    private String shortens(String value,float maxWidth,PDType1Font fontType,float fontSize) { // TODO inefficient performance
+    private String shortens(String value,float maxWidth,PDFont fontType,float fontSize) { // TODO inefficient performance
         final int nCharsSubstitute = 3;
-        while (Utility.getWidth(value,fontType,fontSize) > maxWidth) {
+        while (FontService.getWidth(value,fontType,fontSize) > maxWidth) {
             value = value.substring(0, value.length() - nCharsSubstitute).replaceFirst(".{"+nCharsSubstitute+"}$", "...");
         }
         return value;
     }
 
-    private String[] buildStringsWithMaxWidth(String[] split,float maxWidth,PDType1Font fontType,float fontSize) {
+    private String[] buildStringsWithMaxWidth(String[] split,float maxWidth,PDFont fontType,float fontSize) {
         List<String> retValue = new ArrayList<>();
         for (int i=0;i<split.length;i++) {
             String value = split[i];
-            if (Utility.getWidth(value,fontType,fontSize) > maxWidth) {
+            if (FontService.getWidth(value,fontType,fontSize) > maxWidth) {
                 value = shortens(value,maxWidth,fontType,fontSize);
             } else {
                 for(int j=i+1;j<split.length;j++){
-                    if(Utility.getWidth(value+" "+split[j],fontType,fontSize) > maxWidth) break;
+                    if(FontService.getWidth(value+" "+split[j],fontType,fontSize) > maxWidth) break;
                     value += " "+split[j];
                     i++;
                 }

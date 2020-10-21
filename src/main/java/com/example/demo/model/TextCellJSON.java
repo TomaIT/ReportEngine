@@ -1,11 +1,13 @@
 package com.example.demo.model;
 
 import com.example.demo.Utility;
+import com.example.demo.reportengine.FontService;
 import com.example.demo.reportengine.components.TextCell;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;
 import com.example.demo.reportengine.components.properties.VerticalAlign;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.awt.*;
@@ -26,7 +28,7 @@ public class TextCellJSON {
                 value,
                 getHorizontalAlign(),
                 VerticalAlign.center,
-                getPDType1Font(),
+                getPDFont(),
                 getFontSize(),
                 underline,
                 null,
@@ -43,14 +45,9 @@ public class TextCellJSON {
         return HorizontalAlign.center;
     }
 
-    public PDType1Font getPDType1Font() {
-        if(fontfamily == null || fontfamily.isBlank()) return PDType1Font.COURIER;
-        switch (fontfamily) {
-            case "Courier New": return PDType1Font.COURIER;
-            case "Georgia": return PDType1Font.HELVETICA;
-            case "Arial": return PDType1Font.TIMES_ROMAN;
-        }
-        return PDType1Font.COURIER;
+    public PDFont getPDFont() {
+        if(fontfamily==null || fontfamily.isBlank()) return PDType1Font.HELVETICA;
+        return FontService.findFont(fontfamily);
     }
 
     public float getFontSize() {

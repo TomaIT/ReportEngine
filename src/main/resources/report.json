@@ -4,8 +4,42 @@
     "marginleft": 25,
     "marginright": 25,
     "margintop": 25,
-    "marginbottom": 25
+    "marginbottom": 25,
+    "headerfirstpage": true,
+    "footerfirstpage": true,
+    "footercontentpage": true,
+    "headercontentpage": true,
+    "headerlastpage": true,
+    "footerlastpage": true
   },
+  "parameters": [
+    {
+      "name": "",
+      "value": ""
+    }
+  ],
+  "content": [
+    {
+      "id": "aba080c8-84a8-4056-af6b-f72f5e5e2937",
+      "label": "Table",
+      "type": "table",
+      "mapping": "",
+      "maxrows": -1,
+      "cols": [
+        {
+          "value": "a"
+        }
+      ],
+      "conditions": [
+        {
+          "attribute": "",
+          "operator": "",
+          "value": "",
+          "gate": ""
+        }
+      ]
+    }
+  ],
   "header": {
     "rows": [
       {

@@ -12,6 +12,8 @@ public class ReportJSON {
     private UnevenTableJSON footer;
     private UnevenTableJSON header;
     private Metadata metadata;
+    private Object[] parameters;
+    private Object[] content;
 
     public Report build() throws OverlappingException {
         Report report = new Report(

@@ -3,6 +3,7 @@ package com.example.demo;
 import com.example.demo.exceptions.OverlappingException;
 import com.example.demo.model.ReportJSON;
 import com.example.demo.reportengine.Component;
+import com.example.demo.reportengine.FontService;
 import com.example.demo.reportengine.Report;
 import com.example.demo.reportengine.components.TextCell;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;
@@ -36,6 +37,7 @@ import java.util.Map;
 @SpringBootApplication
 public class DemoApplication  implements CommandLineRunner {
     private final TemplateEngine templateEngine;
+    private final FontService fontService;
     // Page configuration
     private static final PDRectangle PAGE_SIZE = PDRectangle.A4;
     private static final float MARGIN = 20;
@@ -51,8 +53,9 @@ public class DemoApplication  implements CommandLineRunner {
     private static final float ROW_HEIGHT = 15;
     private static final float CELL_MARGIN = 1;
 
-    public DemoApplication(TemplateEngine templateEngine) {
+    public DemoApplication(TemplateEngine templateEngine, FontService fontService) {
         this.templateEngine = templateEngine;
+        this.fontService = fontService;
     }
 
     public static void main(String[] args) {
@@ -200,8 +203,11 @@ public class DemoApplication  implements CommandLineRunner {
             header.addCell(i, );
             header.addCell(i+1, );
         }*/
-
-
+        //Utility.moveFiles("src/main/resources/fonts/","src/main/resources/googlefonts",Arrays.asList(".ttf", ".otf"));
+        //Utility.downloadFonts("src/main/resources/fonts/");
+        /*COSDictionary a = new COSDictionary();
+        FontFileFinder f = new FontFileFinder();
+        System.out.println(PDType0Font.load(new PDDocument(),new File(f.find().get(15).toString())));*/
         /*header.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getUpperRightY(),report.getMediaBoxPage().getWidth(),2f);
 
         report.setFooter(Footer.voidFooter(report,25f,Utility.hex2Rgb("#fe9200")));
