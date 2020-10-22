@@ -82,27 +82,21 @@ public class Component {
     public PDRectangle getFirstVoidSpace(){
         float width = pdRectangle.getWidth(); // Assumption is immutable
         float x = pdRectangle.getLowerLeftX(); // Assumption is immutable
-        System.out.println("A "+getPdRectangle().getUpperRightY()+" "+getPdRectangle().getLowerLeftY());
         if(components.size() <= 0) return new PDRectangle(x,pdRectangle.getLowerLeftY(),width,pdRectangle.getWidth());
-System.out.println("B");
+
         components.sort((a,b)-> Double.compare(b.getPdRectangle().getUpperRightY(), a.getPdRectangle().getUpperRightY()));
-        components.forEach(y->System.out.println(y.getPdRectangle().getUpperRightY()+" "+y.getPdRectangle().getLowerLeftY()));
 
         float height = pdRectangle.getUpperRightY() - components.get(0).pdRectangle.getUpperRightY();
 
         if(height > 0f) return new PDRectangle(x,components.get(0).pdRectangle.getUpperRightY(),width,height);
-        System.out.println("C");
         for (int i=1;i<components.size();i++) {
             height = components.get(i-1).pdRectangle.getLowerLeftY() - components.get(i).pdRectangle.getUpperRightY();
-            System.out.println(height);
             if(height > 0f) return new PDRectangle(x,components.get(i).pdRectangle.getUpperRightY(),width,height);
         }
-        System.out.println("D");
 
         height = components.get(components.size()-1).pdRectangle.getLowerLeftY() - pdRectangle.getLowerLeftY();
 
         if(height > 0f) return new PDRectangle(x,pdRectangle.getLowerLeftY(),width,height);
-        System.out.println("E");
 
         return null;
     }

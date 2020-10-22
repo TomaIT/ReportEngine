@@ -1,7 +1,7 @@
 package com.example.demo.reportengine.components;
 
 import com.example.demo.reportengine.Component;
-import com.example.demo.reportengine.FontService;
+import com.example.demo.reportengine.services.FontService;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;
 import com.example.demo.reportengine.components.properties.VerticalAlign;
 import lombok.AccessLevel;
@@ -249,7 +249,7 @@ public class TextCell extends Component {
         cells.forEach(x->getComponents().add(x));
         setValue("");
         setUnderline(false);
-        return totHeight>minHeight;
+        return true;// Return always true because is changed height (rowMargin of father component isn't considered)
     }
 
 }

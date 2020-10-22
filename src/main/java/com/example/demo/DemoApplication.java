@@ -3,7 +3,7 @@ package com.example.demo;
 import com.example.demo.exceptions.OverlappingException;
 import com.example.demo.model.ReportJSON;
 import com.example.demo.reportengine.Component;
-import com.example.demo.reportengine.FontService;
+import com.example.demo.reportengine.services.FontService;
 import com.example.demo.reportengine.Report;
 import com.example.demo.reportengine.components.TextCell;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;

@@ -5,6 +5,7 @@ import com.example.demo.reportengine.components.UnevenTable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.awt.*;
 import java.util.List;
 
 @Data
@@ -23,7 +24,7 @@ public class UnevenTableJSON {
                 components[i][j]=textCellJSON.build();
             }
         }
-        UnevenTable unevenTable = new UnevenTable(components,null,null);
+        UnevenTable unevenTable = new UnevenTable(components, Color.RED,null);
         unevenTable.build(startX,endY,maxWidth,minHeight);
         return unevenTable;
     }

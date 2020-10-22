@@ -1,4 +1,4 @@
-package com.example.demo.reportengine;
+package com.example.demo.reportengine.services;
 
 import com.example.demo.Utility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -15,8 +15,8 @@ import java.util.Objects;
 @Service
 public class FontService {
 	private static final String srcPath = "src/main/resources/fonts/";
-	private static final Map<String,PDFont> fontTypes = loadFonts(new HashMap<>(),srcPath);
 	private static final Map<String,Integer> distances = new HashMap<>();
+	private static final Map<String,PDFont> fontTypes = loadFonts(new HashMap<>(),srcPath);
 
 
 	public static PDFont findFont(String fontName) {
@@ -48,11 +48,13 @@ public class FontService {
 				continue;
 			}
 			if (file.isFile()) {
-				try {
-					PDType0Font font = PDType0Font.load(new PDDocument(),file);
-					fontTypes.put(font.getName(),font);
-					distances.put(font.getName(),0);
-				} catch (Exception ignored) { }
+				if(file.toString().endsWith(".ttf")) {
+					try {
+						PDType0Font font = PDType0Font.load(new PDDocument(), file);
+						fontTypes.put(font.getName(), font);
+						distances.put(font.getName(), 0);
+					} catch (Exception ignored) { }
+				}
 			}
 		}
 		return fontTypes;

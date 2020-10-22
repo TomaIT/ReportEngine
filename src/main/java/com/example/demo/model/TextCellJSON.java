@@ -1,7 +1,7 @@
 package com.example.demo.model;
 
 import com.example.demo.Utility;
-import com.example.demo.reportengine.FontService;
+import com.example.demo.reportengine.services.FontService;
 import com.example.demo.reportengine.components.TextCell;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;
 import com.example.demo.reportengine.components.properties.VerticalAlign;
@@ -31,7 +31,7 @@ public class TextCellJSON {
                 getPDFont(),
                 getFontSize(),
                 underline,
-                null,
+                null,//Color.GREEN,
                 getTextColor(),
                 getBackgroundColor());
     }
@@ -48,7 +48,7 @@ public class TextCellJSON {
     public PDFont getPDFont() {
         if(fontfamily==null || fontfamily.isBlank()) return PDType1Font.HELVETICA;
         PDFont pdFont = FontService.findFont(fontfamily);
-        System.out.println(pdFont);
+        //System.out.println(pdFont);
         return pdFont;
     }
 

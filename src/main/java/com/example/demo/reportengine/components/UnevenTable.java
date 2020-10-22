@@ -42,16 +42,17 @@ public class UnevenTable extends Component {
     public boolean build(float startX,float endY,float maxWidth,float minHeight) {
         float sumHeight = 0;
         float tempEndY = endY;
-        for (Component[] row : table) {
+        for(int i=0;i<table.length;i++){
+            Component[] row = table[i];
             if (row.length <= 0) throw new RuntimeException("Cell row is void");
             float columnWidth = maxWidth / row.length;
             for (int j = 0; j < row.length; j++) {
-                if (row[j].build(
+                boolean isChanged = row[j].build(
                         startX + j * columnWidth,
-                        tempEndY, //endY - (float) Arrays.stream(table).limit(i).mapToDouble(this::getMinHeightRow).sum(),
+                        endY - (float) Arrays.stream(table).limit(i).mapToDouble(this::getMinHeightRow).sum(),//tempEndY, //endY - (float) Arrays.stream(table).limit(i).mapToDouble(this::getMinHeightRow).sum(),
                         columnWidth,
-                        getMinHeightRow(row)
-                )) {
+                        getMinHeightRow(row));
+                if (isChanged) {
                     j = -1;
                 }
             }
@@ -67,19 +68,21 @@ public class UnevenTable extends Component {
                 if(row.length<=0) throw new RuntimeException("Cell row is void");
                 float columnWidth = maxWidth/row.length;
                 for(int j=0;j<row.length;j++) {
-                    if(row[j].build(
+                    boolean isChanged = row[j].build(
                             startX+j*columnWidth,
-                            tempEndY,
+                            endY - (float) Arrays.stream(table).limit(i).mapToDouble(this::getMinHeightRow).sum(),//tempEndY,
                             columnWidth,
-                            minHeight*factors[i]
-                    )){j=-1;}
+                            minHeight*factors[i]);
+                    if(isChanged){
+                        j=-1;
+                    }
                 }
                 tempEndY -= row[0].getPdRectangle().getHeight();
                 sumHeight += row[0].getPdRectangle().getHeight();
             }
         }
         setPdRectangle(new PDRectangle(startX,endY-sumHeight,maxWidth,sumHeight));
-        System.out.println(getPdRectangle().getUpperRightY()+" - "+getPdRectangle().getLowerLeftY());
+
         Arrays.stream(table).forEach(x-> Arrays.stream(x).forEach(y-> getComponents().add(y)));
         return minHeight < sumHeight;
     }
