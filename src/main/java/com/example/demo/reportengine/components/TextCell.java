@@ -1,5 +1,6 @@
 package com.example.demo.reportengine.components;
 
+import com.example.demo.Utility;
 import com.example.demo.reportengine.Component;
 import com.example.demo.reportengine.services.FontService;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;
@@ -18,9 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Performance: 1M textCell -> (Constructor and Building in single Thread): 5.5 seconds
- */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class TextCell extends Component {
@@ -107,7 +105,7 @@ public class TextCell extends Component {
             if (split.length > 1) return buildAreaText(startX,endY,maxWidth,minHeight,split);
             setValue(shortens(value,maxWidth,fontType,fontSize));
         }
-        //se areaText necessita riposizinamento sulla y
+        //se areaText necessita riposizionamento sulla y
         if(getComponents().size()>0) {
             float offset;
             boolean isAlreadyChanged;
@@ -232,11 +230,9 @@ public class TextCell extends Component {
     private boolean buildAreaText(float startX,float endY,float maxWidth,float minHeight,String[] split) {
         List<TextCell> cells = new ArrayList<>();
         String[] values = buildStringsWithMaxWidth(split,maxWidth,fontType,fontSize);
-
         float tempHeight = minHeight/values.length;
         float height = (this.minHeight<tempHeight) ? tempHeight : this.minHeight;
         float totHeight = height * values.length;
-
         for (int i=0;i<values.length;i++) {
             TextCell temp = new TextCell(this);
             temp.setValue(values[i]);

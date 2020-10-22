@@ -68,6 +68,17 @@ public class Component {
     }
 
 
+    public void moveTo(float startX, float startY) {
+        if(pdRectangle==null) throw new RuntimeException("Must be call build() before call moveTo");
+
+        float offsetX = pdRectangle.getLowerLeftX()-startX;
+        float offsetY = pdRectangle.getLowerLeftY()-startY;
+
+        setPdRectangle(new PDRectangle(startX,startY,pdRectangle.getWidth(),pdRectangle.getHeight()));
+
+        components.forEach(x->x.moveTo(x.getPdRectangle().getLowerLeftX()-offsetX,x.getPdRectangle().getLowerLeftY()-offsetY));
+    }
+
     public void addComponent(Component component) throws OverlappingException {
         checkOverlapping(component);
         components.add(component);

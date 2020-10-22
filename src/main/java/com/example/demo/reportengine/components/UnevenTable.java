@@ -12,15 +12,19 @@ import java.util.Arrays;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class UnevenTable extends Component {
-    @Setter(AccessLevel.NONE) private static final float rowMinMargin = 15f;
-    @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE) private Component[][] table;
+    @Setter(AccessLevel.NONE)
+    private static final float rowMinMargin = 15f;
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    private Component[][] table;
+    private boolean proportionalColumns = false;
 
     public UnevenTable(Component[][] table) {
         super();
         this.table = table;
     }
 
-    public UnevenTable(Component[][] table, Color borderColor,Color backgroundColor) {
+    public UnevenTable(Component[][] table, Color borderColor, Color backgroundColor) {
         super(borderColor!=null,borderColor,backgroundColor!=null,backgroundColor);
         this.table = table;
     }
@@ -30,7 +34,7 @@ public class UnevenTable extends Component {
      * Costruisce i rettangoli per ogni cella.
      * Suppone una suddivisione delle colonne equa. (es. 3 celle in una riga equivalgono a 3 colonne esattamente larghe uguali)
      * Verifica che la cella cosi creata sia idonea a contenerne il contenuto, se cosi non è,
-     * applica logiche di riduzione del componente per cercare di far stare il contenuto nello spazio dedicato.
+     * applica logiche di riduzione del componente per cercare di far stare il contenuto nello spazio (larghezza) dedicato.
      * VerticalAlign is top, se si vuole più flessibilità occorre un riposizionamento e l'aggiunta di un attributo di allineamento.
      * @param startX
      * @param endY
@@ -49,7 +53,7 @@ public class UnevenTable extends Component {
             for (int j = 0; j < row.length; j++) {
                 boolean isChanged = row[j].build(
                         startX + j * columnWidth,
-                        endY - (float) Arrays.stream(table).limit(i).mapToDouble(this::getMinHeightRow).sum(),//tempEndY, //endY - (float) Arrays.stream(table).limit(i).mapToDouble(this::getMinHeightRow).sum(),
+                        tempEndY,
                         columnWidth,
                         getMinHeightRow(row));
                 if (isChanged) {
@@ -59,6 +63,8 @@ public class UnevenTable extends Component {
             tempEndY -= row[0].getPdRectangle().getHeight();
             sumHeight += row[0].getPdRectangle().getHeight();
         }
+        // La dimensione altezza è minore a minHeight,
+        // quindi applico un aumento proporzionato della height di ogni row
         if(sumHeight<minHeight) {
             float[] factors = new float[table.length];
             for(int i=0;i<table.length;i++) factors[i] = table[i][0].getPdRectangle().getHeight() / sumHeight;
@@ -70,7 +76,7 @@ public class UnevenTable extends Component {
                 for(int j=0;j<row.length;j++) {
                     boolean isChanged = row[j].build(
                             startX+j*columnWidth,
-                            endY - (float) Arrays.stream(table).limit(i).mapToDouble(this::getMinHeightRow).sum(),//tempEndY,
+                            tempEndY,
                             columnWidth,
                             minHeight*factors[i]);
                     if(isChanged){
@@ -86,8 +92,6 @@ public class UnevenTable extends Component {
         Arrays.stream(table).forEach(x-> Arrays.stream(x).forEach(y-> getComponents().add(y)));
         return minHeight < sumHeight;
     }
-
-
 
     @Override
     public float getMinHeight() {
@@ -108,4 +112,6 @@ public class UnevenTable extends Component {
     private float getMinHeightRow(Component[] row) {
         return (float) (Arrays.stream(row).mapToDouble(Component::getMinHeight).max().orElse(0)+rowMinMargin);
     }
+
+
 }

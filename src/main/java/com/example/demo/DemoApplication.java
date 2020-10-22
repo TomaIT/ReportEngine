@@ -143,13 +143,16 @@ public class DemoApplication  implements CommandLineRunner {
     }
 
     private static void prova(){
-        final int nRow = 100000;
+        final int nRow = 1000;
         final int nCol = 10;
         List<TextCell> cells = new ArrayList<>(nRow*nCol);
         long start = System.currentTimeMillis();
         for(int i=0;i<nRow;i++){
             for(int j=0;j<nCol;j++){
-                cells.add(createCell(HorizontalAlign.center,"lala",true));
+                cells.add(createCell(HorizontalAlign.center,
+                        "A D I D A S prova ciao lalallalalallaalal" +
+                                "alallalalallaalalalallalalallaalalalallalalallaalalalallalalallaalalal allalalallaala",
+                        true));
             }
         }
 

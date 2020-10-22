@@ -31,7 +31,7 @@ public class TextCellJSON {
                 getPDFont(),
                 getFontSize(),
                 underline,
-                null,//Color.GREEN,
+                Color.GREEN,
                 getTextColor(),
                 getBackgroundColor());
     }

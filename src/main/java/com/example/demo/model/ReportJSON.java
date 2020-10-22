@@ -24,7 +24,8 @@ public class ReportJSON {
                 metadata.getMarginbottom());
         UnevenTable header = this.header.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getUpperRightY(),report.getMediaBoxPage().getWidth(),1f);
         UnevenTable footer = this.footer.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY()+300f,report.getMediaBoxPage().getWidth(),1f);
-        footer.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY()+footer.getPdRectangle().getHeight(),report.getMediaBoxPage().getWidth(),footer.getMinHeight());
+        footer.moveTo(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY());
+        //footer.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY()+footer.getPdRectangle().getHeight(),report.getMediaBoxPage().getWidth(),footer.getMinHeight());
 
         report.setHeader(header);
         report.setFooter(footer);
