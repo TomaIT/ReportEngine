@@ -15,13 +15,8 @@ public class ReportJSON {
     private Object[] parameters;
     private Object[] content;
 
-    public Report build() throws OverlappingException {
-        Report report = new Report(
-                metadata.getFormat(),
-                metadata.getMarginleft(),
-                metadata.getMarginright(),
-                metadata.getMargintop(),
-                metadata.getMarginbottom());
+    public Report build() throws OverlappingException, CloneNotSupportedException {
+        Report report = metadata.build();
         UnevenTable header = this.header.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getUpperRightY(),report.getMediaBoxPage().getWidth(),1f);
         UnevenTable footer = this.footer.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY()+300f,report.getMediaBoxPage().getWidth(),1f);
         footer.moveTo(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY());
@@ -29,7 +24,8 @@ public class ReportJSON {
 
         report.setHeader(header);
         report.setFooter(footer);
-        report.addPage();
+
+        report.build();
 
 
         return report;

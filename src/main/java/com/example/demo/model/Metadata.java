@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.example.demo.reportengine.Report;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -18,6 +19,12 @@ public class Metadata {
     private boolean headercontentpage;
     private boolean headerlastpage;
     private boolean footerlastpage;
+
+    public Report build() {
+        return new Report(getFormat(),marginleft,marginright,margintop,marginbottom,
+                headerfirstpage,headercontentpage,headerlastpage,
+                footerfirstpage,footercontentpage,footerlastpage);
+    }
 
     public PDRectangle getFormat() {
         switch (format) {

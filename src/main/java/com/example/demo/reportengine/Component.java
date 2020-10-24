@@ -1,32 +1,35 @@
 package com.example.demo.reportengine;
 
 import com.example.demo.exceptions.OverlappingException;
+import com.example.demo.reportengine.components.TextCell;
 import lombok.*;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
-public class Component {
+public class Component implements Cloneable {
     @Setter(AccessLevel.NONE) private static final float borderLineWidth = 0.5f;
     private PDRectangle pdRectangle = null;
     private boolean bordered = false;
     private Color borderColor = Color.BLACK;
     private boolean filled = false;
     private Color backgroundColor = Color.WHITE;
+    private boolean visible = true;
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private List<Component> components = new ArrayList<>();
     @Setter(AccessLevel.NONE) protected float minWidth;
     @Setter(AccessLevel.NONE) protected float minHeight;
 
-    public Component(Component component) {
+    /*public Component(Component component) {
         if(component.pdRectangle != null) {
             this.pdRectangle = new PDRectangle(
                     component.pdRectangle.getLowerLeftX(),
@@ -41,7 +44,7 @@ public class Component {
         this.minWidth = component.minWidth;
         this.minHeight = component.minHeight;
         this.components = component.components.stream().map(Component::new).collect(Collectors.toList());
-    }
+    }*/
     public Component(float startX,float startY,float width,float height){
         this.pdRectangle = new PDRectangle(startX,startY,width,height);
     }
@@ -116,6 +119,7 @@ public class Component {
 
     protected void renderWithoutComponents(PDPageContentStream pdPageContentStream) throws IOException {
         if (pdRectangle==null) throw new RuntimeException("Must be call build() before render.");
+        if (!visible) return;
         if (filled || bordered) {
             if (bordered) {
                 pdPageContentStream.setLineWidth(borderLineWidth);
@@ -130,6 +134,7 @@ public class Component {
     }
 
     public void render(PDPageContentStream pdPageContentStream) throws IOException {
+        if (!visible) return;
         renderWithoutComponents(pdPageContentStream);
         for(Component component : components) component.render(pdPageContentStream);
     }
@@ -142,7 +147,7 @@ public class Component {
      * @param minHeight
      * @return true se ha aumentato la height rispetto a minHeight, altrimenti false
      */
-    public boolean build(float startX, float endY,float maxWidth,float minHeight){
+    public boolean build(float startX, float endY,float maxWidth,float minHeight) throws CloneNotSupportedException {
         throw new RuntimeException("Not Implemented");
     }
 
@@ -158,5 +163,30 @@ public class Component {
     public void checkOverlapping(Component component) throws OverlappingException {
         if(components.stream().anyMatch(x->x.isOverlapped(component)))
             throw new OverlappingException("Component is overlapped with other Component");
+    }
+
+    @Override
+    public Component clone() throws CloneNotSupportedException {
+        Component ret = (Component) super.clone();
+        if(pdRectangle != null) {
+            ret.pdRectangle = new PDRectangle(
+                    pdRectangle.getLowerLeftX(),
+                    pdRectangle.getLowerLeftY(),
+                    pdRectangle.getWidth(),
+                    pdRectangle.getHeight());
+        }
+        ret.bordered = bordered;
+        ret.borderColor = borderColor;
+        ret.filled = filled;
+        ret.backgroundColor = backgroundColor;
+        ret.minWidth = minWidth;
+        ret.minHeight = minHeight;
+        List<Component> list = new ArrayList<>();
+        for (Component component : components) {
+            Component clone = component.clone();
+            list.add(clone);
+        }
+        ret.components = list;
+        return ret;
     }
 }

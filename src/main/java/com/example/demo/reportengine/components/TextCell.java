@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
@@ -16,12 +17,13 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class TextCell extends Component {
+public class TextCell extends Component implements Cloneable {
     @Setter(AccessLevel.NONE) private static final float minMarginText = 2f;
     @Setter(AccessLevel.NONE) private static final float underlineWidthFactor = 0.03f;
     @Setter(AccessLevel.NONE) private static final float underlineMarginFactor = 0.08f;
@@ -40,7 +42,7 @@ public class TextCell extends Component {
         updateHeights();
         updateWidths();
     }
-    public TextCell(TextCell textCell) {
+    /*public TextCell(TextCell textCell) {
         super(textCell);
         setValue(textCell.value);
         setHorizontalAlign(textCell.horizontalAlign);
@@ -52,7 +54,7 @@ public class TextCell extends Component {
         setBackgroundColor(textCell.getBackgroundColor());
         updateHeights();
         updateWidths();
-    }
+    }*/
     public TextCell(String value, HorizontalAlign horizontalAlign, VerticalAlign verticalAlign, PDFont fontType,
                     float fontSize, boolean underline, Color borderColor, Color textColor, Color backgroundColor) {
         super(borderColor!=null,borderColor,backgroundColor!=null,backgroundColor);
@@ -96,7 +98,7 @@ public class TextCell extends Component {
      * NOTA: se true necessita ricalcolo se si vuole aggiungere margine
      */
     @Override
-    public boolean build(float startX,float endY,float maxWidth,float minHeight) {
+    public boolean build(float startX,float endY,float maxWidth,float minHeight) throws CloneNotSupportedException {
         if(minHeight < this.minHeight) throw new RuntimeException("TextCell height isn't sufficient.");
 
         String[] split = value.split("\\s+");
@@ -144,6 +146,7 @@ public class TextCell extends Component {
 
     @Override
     protected void renderWithoutComponents(PDPageContentStream pdPageContentStream) throws IOException {
+        if(!isVisible())return;
         super.renderWithoutComponents(pdPageContentStream);
         if (value != null && !value.isBlank()) {
             pdPageContentStream.setNonStrokingColor(textColor);
@@ -181,6 +184,7 @@ public class TextCell extends Component {
 
     @Override
     public void render(PDPageContentStream pdPageContentStream) throws IOException {
+        if(!isVisible())return;
         renderWithoutComponents(pdPageContentStream);
         for(Component component : getComponents()) component.render(pdPageContentStream);
     }
@@ -227,14 +231,14 @@ public class TextCell extends Component {
         return retValue.toArray(new String[0]);
     }
 
-    private boolean buildAreaText(float startX,float endY,float maxWidth,float minHeight,String[] split) {
+    private boolean buildAreaText(float startX,float endY,float maxWidth,float minHeight,String[] split) throws CloneNotSupportedException {
         List<TextCell> cells = new ArrayList<>();
         String[] values = buildStringsWithMaxWidth(split,maxWidth,fontType,fontSize);
         float tempHeight = minHeight/values.length;
         float height = (this.minHeight<tempHeight) ? tempHeight : this.minHeight;
         float totHeight = height * values.length;
         for (int i=0;i<values.length;i++) {
-            TextCell temp = new TextCell(this);
+            TextCell temp = this.clone();//SerializationUtils.clone(this);//new TextCell(this);
             temp.setValue(values[i]);
             //Return always false
             temp.build(startX,endY-i*height,maxWidth,height);
@@ -248,4 +252,18 @@ public class TextCell extends Component {
         return true;// Return always true because is changed height (rowMargin of father component isn't considered)
     }
 
+    @Override
+    public TextCell clone() throws CloneNotSupportedException {
+        TextCell textCell = (TextCell) super.clone();
+        textCell.value = value;
+        textCell.horizontalAlign = horizontalAlign;
+        textCell.verticalAlign = verticalAlign;
+        textCell.fontType = fontType; // TODO not sure
+        textCell.fontSize = fontSize;
+        textCell.underline = underline;
+        textCell.textColor = new Color(textColor.getRGB());
+        textCell.updateHeights();
+        textCell.updateWidths();
+        return textCell;
+    }
 }

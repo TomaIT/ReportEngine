@@ -7,23 +7,36 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class UnevenTable extends Component {
+public class UnevenTable extends Component implements Cloneable {
     @Setter(AccessLevel.NONE)
     private static final float rowMinMargin = 15f;
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private Component[][] table;
-    private boolean proportionalColumns = false;
 
+    /*public UnevenTable(UnevenTable unevenTable) {
+        super(unevenTable);
+        System.out.println("called");
+        if(unevenTable.table!=null) {
+            table = new Component[unevenTable.table.length][];
+            for(int i=0;i<unevenTable.table.length;i++){
+                table[i]=new Component[unevenTable.table[i].length];
+                for(int j=0;j<unevenTable.table[i].length;j++){
+                    table[i][j] = new Component(unevenTable.table[i][j]);
+                }
+            }
+        }
+
+    }*/
     public UnevenTable(Component[][] table) {
         super();
         this.table = table;
     }
-
     public UnevenTable(Component[][] table, Color borderColor, Color backgroundColor) {
         super(borderColor!=null,borderColor,backgroundColor!=null,backgroundColor);
         this.table = table;
@@ -43,7 +56,7 @@ public class UnevenTable extends Component {
      * @return true se ha aumentato la height rispetto a minHeight, altrimenti false
      */
     @Override
-    public boolean build(float startX,float endY,float maxWidth,float minHeight) {
+    public boolean build(float startX,float endY,float maxWidth,float minHeight) throws CloneNotSupportedException {
         float sumHeight = 0;
         float tempEndY = endY;
         for(int i=0;i<table.length;i++){
@@ -100,11 +113,13 @@ public class UnevenTable extends Component {
 
     @Override
     protected void renderWithoutComponents(PDPageContentStream pdPageContentStream) throws IOException {
+        if(!isVisible())return;
         super.renderWithoutComponents(pdPageContentStream);
     }
 
     @Override
     public void render(PDPageContentStream pdPageContentStream) throws IOException {
+        if(!isVisible())return;
         renderWithoutComponents(pdPageContentStream);
         for(Component component : this.getComponents()) component.render(pdPageContentStream);
     }
@@ -113,5 +128,26 @@ public class UnevenTable extends Component {
         return (float) (Arrays.stream(row).mapToDouble(Component::getMinHeight).max().orElse(0)+rowMinMargin);
     }
 
+    @Override
+    public UnevenTable clone() throws CloneNotSupportedException {
+        UnevenTable ret = (UnevenTable) super.clone();
+        /**
+         * @Setter(AccessLevel.NONE)
+         *     private static final float rowMinMargin = 15f;
+         *     @Setter(AccessLevel.NONE)
+         *     @Getter(AccessLevel.NONE)
+         *     private Component[][] table;
+         */
+        if(table!=null) {
+            ret.table = new Component[table.length][];
+            for(int i=0;i<table.length;i++){
+                ret.table[i]=new Component[table[i].length];
+                for(int j=0;j<table[i].length;j++){
+                    ret.table[i][j] = table[i][j].clone();
+                }
+            }
+        }
+        return ret;
+    }
 
 }

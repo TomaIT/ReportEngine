@@ -7,8 +7,8 @@
     "marginbottom": 25,
     "headerfirstpage": true,
     "footerfirstpage": true,
-    "footercontentpage": true,
-    "headercontentpage": true,
+    "footercontentpage": false,
+    "headercontentpage": false,
     "headerlastpage": true,
     "footerlastpage": true
   },
@@ -57,12 +57,34 @@
       {
         "cols": [
           {
-            "value": "Business Report Q1 2020 triccheballacche ahaha",
+            "value": "Business Report Q1 2020 triccheballacche lalala",
             "align": "left"
           },
           {
             "value": "Product: A3",
             "align": "right"
+          }
+        ]
+      },
+      {
+        "cols": [
+          {
+            "value": "Ciao",
+            "align": "left",
+            "fontfamily": "Impact",
+            "fontsize": "15px"
+          },
+          {
+            "value": "Mario",
+            "align": "left",
+            "fontfamily": "Verdana",
+            "fontsize": "15px"
+          },
+          {
+            "value": "Rossi",
+            "align": "left",
+            "fontfamily": "Comic Sans MS",
+            "fontsize": "15px"
           }
         ]
       }

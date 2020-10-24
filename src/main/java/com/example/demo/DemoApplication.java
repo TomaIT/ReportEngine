@@ -142,7 +142,7 @@ public class DemoApplication  implements CommandLineRunner {
         return textCell;*/
     }
 
-    private static void prova(){
+    private static void prova() throws CloneNotSupportedException {
         final int nRow = 1000;
         final int nCol = 10;
         List<TextCell> cells = new ArrayList<>(nRow*nCol);
@@ -155,8 +155,9 @@ public class DemoApplication  implements CommandLineRunner {
                         true));
             }
         }
-
-        cells.forEach(x->x.build(0,0,25,250));
+        for(TextCell cell : cells) {
+            cell.build(0,0,25,250);
+        }
         System.out.println(System.currentTimeMillis()-start);
 
     }
@@ -173,7 +174,7 @@ public class DemoApplication  implements CommandLineRunner {
         return temp;
     }
 
-    private static void tryByReportJSON() throws IOException, OverlappingException {
+    private static void tryByReportJSON() throws IOException, OverlappingException, CloneNotSupportedException {
         ObjectMapper objectMapper = new ObjectMapper();
         ReportJSON reportJSON = objectMapper.readValue(new File("src/main/resources/report.json"), ReportJSON.class);
         System.out.println(reportJSON);

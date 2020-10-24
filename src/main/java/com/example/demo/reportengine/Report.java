@@ -1,7 +1,11 @@
 package com.example.demo.reportengine;
 
 import com.example.demo.exceptions.OverlappingException;
+import com.example.demo.reportengine.components.UnevenTable;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -14,42 +18,66 @@ import java.util.List;
 @Data
 public class Report {
     // Page attributes
-    private PDRectangle formatPage;
+    @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE) private PDRectangle formatPage;
     private PDRectangle mediaBoxPage;
     private Component header = null;
-    private boolean headerInAllPages = false;
     private Component footer = null;
-    private boolean footerInAllPages = false;
-    private List<Component> pages = new ArrayList<>();
+    private boolean headerFirstPage;
+    private boolean headerContentPage;
+    private boolean headerLastPage;
+    private boolean footerFirstPage;
+    private boolean footerContentPage;
+    private boolean footerLastPage;
+    private List<Component> contents = new ArrayList<>();
+    //Pages is builded by build() method
+    @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE) private List<Page> pages = new ArrayList<>();
 
-    public Report(PDRectangle formatPage, float marginLeft, float marginRight, float marginTop, float marginBottom) {
+    public Report(PDRectangle formatPage, float marginLeft, float marginRight, float marginTop, float marginBottom,
+                  boolean headerFirstPage, boolean headerContentPage, boolean headerLastPage,
+                  boolean footerFirstPage, boolean footerContentPage, boolean footerLastPage) {
         this.formatPage = formatPage;
         mediaBoxPage = new PDRectangle(formatPage.getLowerLeftX()+marginLeft,formatPage.getLowerLeftY()+marginBottom,formatPage.getWidth()-marginRight-marginLeft,formatPage.getHeight()-marginBottom-marginTop);
-    }
-
-    public void setHeader(Component header) {
-        this.header = header;
-    }
-    public void setHeaderInAllPages(Component header) {
-        this.header = header;
-        headerInAllPages = true;
-    }
-
-    public void setFooter(Component footer) {
-        this.footer = footer;
-    }
-    public void setFooterInAllPages(Component footer) {
-        this.footer = footer;
-        footerInAllPages = true;
+        this.headerFirstPage = headerFirstPage;
+        this.headerContentPage = headerContentPage;
+        this.headerLastPage = headerLastPage;
+        this.footerFirstPage = footerFirstPage;
+        this.footerContentPage = footerContentPage;
+        this.footerLastPage = footerLastPage;
     }
 
 
-    public void addPage() throws OverlappingException {
-        if(header == null || footer == null) throw new RuntimeException("Please before call addPage() set header & footer");
-        Component page = new Component(mediaBoxPage);
-        if(headerInAllPages || pages.size()<=0) page.addComponent(header);
-        if(footerInAllPages || pages.size()<=0) page.addComponent(footer);
-        pages.add(page);
+    public void addContent(Component content) {
+        contents.add(content);
+    }
+
+    /**
+     * Methoc that makes the pages and split or refactor the components
+     */
+    public void build() throws OverlappingException, CloneNotSupportedException {
+        pages.add(new Page(mediaBoxPage,header,footer));
+        pages.add(new Page(mediaBoxPage,header,footer));
+        pages.add(new Page(mediaBoxPage,header,footer));
+
+
+
+
+
+        setHeaderAndFooterVisibilities();
+    }
+
+    private void setHeaderAndFooterVisibilities() {
+        if(pages.size()>0){
+            pages.get(0).getHeader().setVisible(headerFirstPage);
+            pages.get(0).getFooter().setVisible(footerFirstPage);
+        }
+        if(pages.size()>1) {
+            pages.get(pages.size()-1).getHeader().setVisible(headerLastPage);
+            pages.get(pages.size()-1).getFooter().setVisible(footerLastPage);
+        }
+        for(int i=1;i<pages.size()-1;i++){
+            pages.get(i).getHeader().setVisible(headerContentPage);
+            pages.get(i).getFooter().setVisible(footerContentPage);
+        }
     }
 
     /**
@@ -58,6 +86,7 @@ public class Report {
      * @throws IOException
      */
     public PDDocument render() throws IOException {
+        if(pages.size()<=0) throw new RuntimeException("Must be call build() before rendering. pages.size is 0.");
         PDDocument pdDocument = new PDDocument();
         for(Component component : pages){
             PDPage page = new PDPage(formatPage);
