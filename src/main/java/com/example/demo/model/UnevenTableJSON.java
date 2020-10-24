@@ -13,7 +13,7 @@ import java.util.List;
 public class UnevenTableJSON {
     private List<Row> rows;
 
-    public UnevenTable build(float startX,float endY,float maxWidth,float minHeight) throws CloneNotSupportedException {
+    public UnevenTable build(float startX,float endY,float maxWidth) throws CloneNotSupportedException {
 
         Component[][] components = new Component[rows.size()][];
         for(int i=0;i<rows.size();i++){
@@ -25,7 +25,7 @@ public class UnevenTableJSON {
             }
         }
         UnevenTable unevenTable = new UnevenTable(components, Color.RED,null);
-        unevenTable.build(startX,endY,maxWidth,minHeight);
+        unevenTable.build(startX,endY,maxWidth);
         return unevenTable;
     }
 }

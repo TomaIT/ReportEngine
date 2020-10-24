@@ -34,15 +34,13 @@ public class UnevenTable extends Component implements Cloneable {
      * Verifica che la cella cosi creata sia idonea a contenerne il contenuto, se cosi non è,
      * applica logiche di riduzione del componente per cercare di far stare il contenuto nello spazio (larghezza) dedicato.
      * VerticalAlign is top, se si vuole più flessibilità occorre un riposizionamento e l'aggiunta di un attributo di allineamento.
-     * TODO se minHeight è maggiore della height necessaria non aumenta la height ( da vedere se è necessario ), attualmente presenta bug
      * @param startX
      * @param endY
      * @param maxWidth
-     * @param minHeight
-     * @return true se ha aumentato la height rispetto a minHeight, altrimenti false
+     * @return height
      */
     @Override
-    public boolean build(float startX,float endY,float maxWidth,float minHeight) throws CloneNotSupportedException {
+    public float build(float startX,float endY,float maxWidth) throws CloneNotSupportedException {
         float sumHeight = 0;
         float tempEndY = endY;
         for(int i=0;i<table.length;i++){
@@ -62,35 +60,9 @@ public class UnevenTable extends Component implements Cloneable {
             tempEndY -= row[0].getPdRectangle().getHeight();
             sumHeight += row[0].getPdRectangle().getHeight();
         }
-        /*// La dimensione altezza è minore a minHeight,
-        // quindi applico un aumento proporzionato della height di ogni row
-        if(sumHeight<minHeight) {
-            float[] factors = new float[table.length];
-            for(int i=0;i<table.length;i++) factors[i] = table[i][0].getPdRectangle().getHeight() / sumHeight;
-            tempEndY = endY;
-            sumHeight = 0;
-            for(int i=0;i<table.length;i++){
-                Component[] row = table[i];
-                if(row.length<=0) throw new RuntimeException("Cell row is void");
-                float columnWidth = maxWidth/row.length;
-                for(int j=0;j<row.length;j++) {
-                    boolean isChanged = row[j].build(
-                            startX+j*columnWidth,
-                            tempEndY,
-                            columnWidth,
-                            minHeight*factors[i]);
-                    if(isChanged){
-                        j=-1;
-                    }
-                }
-                tempEndY -= row[0].getPdRectangle().getHeight();
-                sumHeight += row[0].getPdRectangle().getHeight();
-            }
-        }*/
         setPdRectangle(new PDRectangle(startX,endY-sumHeight,maxWidth,sumHeight));
-
         Arrays.stream(table).forEach(x-> Arrays.stream(x).forEach(y-> getComponents().add(y)));
-        return minHeight < sumHeight;
+        return sumHeight;
     }
 
     @Override

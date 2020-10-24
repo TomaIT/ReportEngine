@@ -175,7 +175,7 @@ public class TextCell extends Component implements Cloneable {
 
     private void updateHeights() {
         textHeight = (value == null || value.isBlank()) ? 0 : FontService.getHeight(fontType,fontSize);
-        minHeight = (getPdRectangle() != null) ?
+        minHeight = (getPdRectangle() != null && getPdRectangle().getHeight()>=textHeight + minMarginText*2) ?
                 getPdRectangle().getHeight() :
                 (underline) ?
                         textHeight + minMarginText*2 + (fontSize*underlineWidthFactor) + (fontSize*underlineMarginFactor) :

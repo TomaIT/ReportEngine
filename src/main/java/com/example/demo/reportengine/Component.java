@@ -132,6 +132,18 @@ public class Component implements Cloneable {
         throw new RuntimeException("Not Implemented");
     }
 
+    /**
+     *
+     * @param startX
+     * @param endY
+     * @param maxWidth
+     * @return height
+     * @throws CloneNotSupportedException
+     */
+    public float build(float startX, float endY,float maxWidth) throws CloneNotSupportedException {
+        throw new RuntimeException("Not Implemented");
+    }
+
 
     public boolean isOverlapped(Component component){
         return component != null && component.pdRectangle != null && pdRectangle != null &&
