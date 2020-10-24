@@ -7,7 +7,6 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 import java.awt.*;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Arrays;
 
 @EqualsAndHashCode(callSuper = true)
@@ -19,20 +18,6 @@ public class UnevenTable extends Component implements Cloneable {
     @Getter(AccessLevel.NONE)
     private Component[][] table;
 
-    /*public UnevenTable(UnevenTable unevenTable) {
-        super(unevenTable);
-        System.out.println("called");
-        if(unevenTable.table!=null) {
-            table = new Component[unevenTable.table.length][];
-            for(int i=0;i<unevenTable.table.length;i++){
-                table[i]=new Component[unevenTable.table[i].length];
-                for(int j=0;j<unevenTable.table[i].length;j++){
-                    table[i][j] = new Component(unevenTable.table[i][j]);
-                }
-            }
-        }
-
-    }*/
     public UnevenTable(Component[][] table) {
         super();
         this.table = table;
@@ -131,13 +116,6 @@ public class UnevenTable extends Component implements Cloneable {
     @Override
     public UnevenTable clone() throws CloneNotSupportedException {
         UnevenTable ret = (UnevenTable) super.clone();
-        /**
-         * @Setter(AccessLevel.NONE)
-         *     private static final float rowMinMargin = 15f;
-         *     @Setter(AccessLevel.NONE)
-         *     @Getter(AccessLevel.NONE)
-         *     private Component[][] table;
-         */
         if(table!=null) {
             ret.table = new Component[table.length][];
             for(int i=0;i<table.length;i++){

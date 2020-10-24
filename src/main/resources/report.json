@@ -7,9 +7,9 @@
     "marginbottom": 25,
     "headerfirstpage": true,
     "footerfirstpage": true,
-    "footercontentpage": false,
+    "footercontentpage": true,
     "headercontentpage": false,
-    "headerlastpage": true,
+    "headerlastpage": false,
     "footerlastpage": true
   },
   "parameters": [

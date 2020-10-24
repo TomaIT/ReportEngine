@@ -1,7 +1,6 @@
 package com.example.demo.reportengine;
 
 import com.example.demo.exceptions.OverlappingException;
-import com.example.demo.reportengine.components.UnevenTable;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -51,7 +50,7 @@ public class Report {
     }
 
     /**
-     * Methoc that makes the pages and split or refactor the components
+     * Method that makes the pages and split or refactor the components
      */
     public void build() throws OverlappingException, CloneNotSupportedException {
         pages.add(new Page(mediaBoxPage,header,footer));
@@ -97,7 +96,5 @@ public class Report {
         }
         return pdDocument;
     }
-
-
 
 }

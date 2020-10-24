@@ -1,17 +1,14 @@
 package com.example.demo.reportengine;
 
 import com.example.demo.exceptions.OverlappingException;
-import com.example.demo.reportengine.components.TextCell;
 import lombok.*;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 import java.awt.*;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -29,22 +26,6 @@ public class Component implements Cloneable {
     @Setter(AccessLevel.NONE) protected float minWidth;
     @Setter(AccessLevel.NONE) protected float minHeight;
 
-    /*public Component(Component component) {
-        if(component.pdRectangle != null) {
-            this.pdRectangle = new PDRectangle(
-                    component.pdRectangle.getLowerLeftX(),
-                    component.pdRectangle.getLowerLeftY(),
-                    component.pdRectangle.getWidth(),
-                    component.pdRectangle.getHeight());
-        }
-        this.bordered = component.bordered;
-        this.borderColor = component.borderColor;
-        this.filled = component.filled;
-        this.backgroundColor = component.backgroundColor;
-        this.minWidth = component.minWidth;
-        this.minHeight = component.minHeight;
-        this.components = component.components.stream().map(Component::new).collect(Collectors.toList());
-    }*/
     public Component(float startX,float startY,float width,float height){
         this.pdRectangle = new PDRectangle(startX,startY,width,height);
     }

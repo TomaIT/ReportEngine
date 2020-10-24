@@ -1,10 +1,10 @@
 package com.example.demo.model;
 
 import com.example.demo.Utility;
-import com.example.demo.reportengine.services.FontService;
 import com.example.demo.reportengine.components.TextCell;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;
 import com.example.demo.reportengine.components.properties.VerticalAlign;
+import com.example.demo.reportengine.services.FontService;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.pdfbox.pdmodel.font.PDFont;

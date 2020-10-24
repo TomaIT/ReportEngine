@@ -1,18 +1,16 @@
 package com.example.demo.reportengine;
 
 import com.example.demo.exceptions.OverlappingException;
-import com.example.demo.reportengine.components.UnevenTable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.SerializationUtils;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class Page extends Component {
+public class Page extends Component implements Cloneable {
     private Component header;
     private Component footer;
+
     public Page(PDRectangle pdRectangle, Component header, Component footer) throws OverlappingException, CloneNotSupportedException {
         super(pdRectangle);
         if (header!=null) {
@@ -23,5 +21,13 @@ public class Page extends Component {
             this.footer = footer.clone();//SerializationUtils.clone(footer);//new UnevenTable((UnevenTable) footer);
             addComponent(this.footer);
         }
+    }
+
+    @Override
+    public Page clone() throws CloneNotSupportedException {
+        Page ret = (Page) super.clone();
+        if (header!=null) ret.header = header.clone();
+        if (footer!=null) ret.footer = footer.clone();
+        return ret;
     }
 }

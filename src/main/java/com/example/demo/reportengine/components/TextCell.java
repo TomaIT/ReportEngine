@@ -1,15 +1,13 @@
 package com.example.demo.reportengine.components;
 
-import com.example.demo.Utility;
 import com.example.demo.reportengine.Component;
-import com.example.demo.reportengine.services.FontService;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;
 import com.example.demo.reportengine.components.properties.VerticalAlign;
+import com.example.demo.reportengine.services.FontService;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
-import org.apache.commons.lang3.SerializationUtils;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
@@ -17,7 +15,6 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.awt.*;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,19 +39,6 @@ public class TextCell extends Component implements Cloneable {
         updateHeights();
         updateWidths();
     }
-    /*public TextCell(TextCell textCell) {
-        super(textCell);
-        setValue(textCell.value);
-        setHorizontalAlign(textCell.horizontalAlign);
-        setVerticalAlign(textCell.verticalAlign);
-        setFontType(textCell.fontType);
-        setFontSize(textCell.fontSize);
-        setUnderline(textCell.underline);
-        setTextColor(textCell.textColor);
-        setBackgroundColor(textCell.getBackgroundColor());
-        updateHeights();
-        updateWidths();
-    }*/
     public TextCell(String value, HorizontalAlign horizontalAlign, VerticalAlign verticalAlign, PDFont fontType,
                     float fontSize, boolean underline, Color borderColor, Color textColor, Color backgroundColor) {
         super(borderColor!=null,borderColor,backgroundColor!=null,backgroundColor);
