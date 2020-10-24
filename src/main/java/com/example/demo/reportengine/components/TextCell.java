@@ -86,12 +86,17 @@ public class TextCell extends Component implements Cloneable {
         if(minHeight < this.minHeight) throw new RuntimeException("TextCell height isn't sufficient.");
 
         String[] split = value.split("\\s+");
-
         if (minWidth > maxWidth) {
             if (split.length > 1) return buildAreaText(startX,endY,maxWidth,minHeight,split);
             setValue(shortens(value,maxWidth,fontType,fontSize));
         }
-        //se areaText necessita riposizionamento sulla y
+        //se areaText necessita riposizionamento e ridimensionamento sulla y
+        repositionAreaText(endY,minHeight);
+        setPdRectangle(new PDRectangle(startX,endY-minHeight,maxWidth,minHeight));
+        return false;
+    }
+
+    private void repositionAreaText(float endY,float height) {
         if(getComponents().size()>0) {
             float offset;
             boolean isAlreadyChanged;
@@ -103,11 +108,11 @@ public class TextCell extends Component implements Cloneable {
                     isAlreadyChanged = (maxY == endY);
                     break;
                 case bottom:
-                    offset = minHeight-this.minHeight;
-                    isAlreadyChanged = (minY == endY-minHeight);
+                    offset = height-this.minHeight;
+                    isAlreadyChanged = (minY == endY-height);
                     break;
                 case center:
-                    offset = (minHeight-this.minHeight) / 2;
+                    offset = (height-this.minHeight) / 2;
                     isAlreadyChanged = (maxY == endY-offset);
                     break;
                 default:
@@ -116,16 +121,10 @@ public class TextCell extends Component implements Cloneable {
             //Prima verifico che il cambiamento non sia già stato fatto
             if (!isAlreadyChanged) {
                 for (Component c : getComponents()) {
-                    c.setPdRectangle(new PDRectangle(
-                            c.getPdRectangle().getLowerLeftX(),
-                            c.getPdRectangle().getLowerLeftY() - offset,
-                            c.getPdRectangle().getWidth(),
-                            c.getPdRectangle().getHeight()));
+                    c.moveTo(c.getPdRectangle().getLowerLeftX(),c.getPdRectangle().getLowerLeftY()-offset);
                 }
             }
         }
-        setPdRectangle(new PDRectangle(startX,endY-minHeight,maxWidth,minHeight));
-        return false;
     }
 
     @Override

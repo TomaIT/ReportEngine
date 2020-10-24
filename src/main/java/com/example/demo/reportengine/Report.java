@@ -54,9 +54,12 @@ public class Report {
      */
     public void build() throws OverlappingException, CloneNotSupportedException {
         pages.add(new Page(mediaBoxPage,header,footer));
-        pages.add(new Page(mediaBoxPage,header,footer));
-        pages.add(new Page(mediaBoxPage,header,footer));
 
+
+
+        PDRectangle voidSpace = pages.get(0).getFirstVoidSpace();
+        contents.get(0).build(voidSpace.getLowerLeftX(),voidSpace.getUpperRightY()-10f,voidSpace.getWidth(),2f);
+        pages.get(0).addComponent(contents.get(0));
 
 
 

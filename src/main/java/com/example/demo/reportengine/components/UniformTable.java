@@ -11,26 +11,30 @@ import java.util.Arrays;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class UnevenTable extends Component implements Cloneable {
+public class UniformTable extends Component implements Cloneable {
     @Setter(AccessLevel.NONE)
-    private static final float rowMinMargin = 15f;
+    private static final float rowMinMargin = 5f;
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private Component[][] table;
 
-    public UnevenTable(Component[][] table) {
+    public UniformTable(Component[][] table) {
         super();
+        int firstRowColumn = table[0].length;
+        for (int i=1;i<table.length;i++) if (table[i].length != firstRowColumn) throw new RuntimeException("Table isn't uniform");
         this.table = table;
     }
-    public UnevenTable(Component[][] table, Color borderColor, Color backgroundColor) {
+    public UniformTable(Component[][] table, Color borderColor, Color backgroundColor) {
         super(borderColor!=null,borderColor,backgroundColor!=null,backgroundColor);
+        int firstRowColumn = table[0].length;
+        for (int i=1;i<table.length;i++) if (table[i].length != firstRowColumn) throw new RuntimeException("Table isn't uniform");
         this.table = table;
     }
 
 
     /**
      * Costruisce i rettangoli per ogni cella.
-     * Suppone una suddivisione delle colonne equa. (es. 3 celle in una riga equivalgono a 3 colonne esattamente larghe uguali)
+     * Suppone una suddivisione delle colonne proporzionale alla larghezza minima delle celle.
      * Verifica che la cella cosi creata sia idonea a contenerne il contenuto, se cosi non è,
      * applica logiche di riduzione del componente per cercare di far stare il contenuto nello spazio (larghezza) dedicato.
      * VerticalAlign is top, se si vuole più flessibilità occorre un riposizionamento e l'aggiunta di un attributo di allineamento.
@@ -45,18 +49,24 @@ public class UnevenTable extends Component implements Cloneable {
     public boolean build(float startX,float endY,float maxWidth,float minHeight) throws CloneNotSupportedException {
         float sumHeight = 0;
         float tempEndY = endY;
-        for(int i=0;i<table.length;i++){
+        int i,j;
+        float[] columnWidth = getColumnWidths(maxWidth);
+        for (i = 0; i < table.length; i++) {
             Component[] row = table[i];
             if (row.length <= 0) throw new RuntimeException("Cell row is void");
-            float columnWidth = maxWidth / row.length;
-            for (int j = 0; j < row.length; j++) {
+
+            float offsetX = 0;
+            for (j = 0; j < row.length; j++) {
                 boolean isChanged = row[j].build(
-                        startX + j * columnWidth,
+                        startX + offsetX,//j * columnWidth,
                         tempEndY,
-                        columnWidth,
+                        columnWidth[j],
                         getMinHeightRow(row));
+                offsetX += columnWidth[j];
                 if (isChanged) {
                     j = -1;
+                    offsetX = 0;
+                    //columnWidth = getColumnWidths(maxWidth);
                 }
             }
             tempEndY -= row[0].getPdRectangle().getHeight();
@@ -65,24 +75,33 @@ public class UnevenTable extends Component implements Cloneable {
         /*// La dimensione altezza è minore a minHeight,
         // quindi applico un aumento proporzionato della height di ogni row
         if(sumHeight<minHeight) {
+            System.out.println("aiaiaiiaia");
             float[] factors = new float[table.length];
-            for(int i=0;i<table.length;i++) factors[i] = table[i][0].getPdRectangle().getHeight() / sumHeight;
+            for(i=0;i<table.length;i++) factors[i] = table[i][0].getPdRectangle().getHeight() / sumHeight;
             tempEndY = endY;
-            sumHeight = 0;
-            for(int i=0;i<table.length;i++){
+            sumHeight =0;
+            for(i=0;i<table.length;i++){
                 Component[] row = table[i];
                 if(row.length<=0) throw new RuntimeException("Cell row is void");
-                float columnWidth = maxWidth/row.length;
-                for(int j=0;j<row.length;j++) {
+                //float[] columnWidth = getColumnWidths(maxWidth);
+                float offsetX = 0;
+                float rowHeight = minHeight*factors[i];
+                System.out.println(rowHeight);
+                for(j=0;j<row.length;j++) {
                     boolean isChanged = row[j].build(
-                            startX+j*columnWidth,
+                            startX + offsetX,//j * columnWidth,,
                             tempEndY,
-                            columnWidth,
-                            minHeight*factors[i]);
+                            columnWidth[j],
+                            rowHeight);
+                    offsetX += columnWidth[j];
                     if(isChanged){
                         j=-1;
+                        offsetX = 0;
+                        //columnWidth = getColumnWidths(maxWidth);
                     }
                 }
+                System.out.println(row[0].getPdRectangle().getHeight());
+                System.out.println();
                 tempEndY -= row[0].getPdRectangle().getHeight();
                 sumHeight += row[0].getPdRectangle().getHeight();
             }
@@ -91,6 +110,19 @@ public class UnevenTable extends Component implements Cloneable {
 
         Arrays.stream(table).forEach(x-> Arrays.stream(x).forEach(y-> getComponents().add(y)));
         return minHeight < sumHeight;
+    }
+
+    private float[] getColumnWidths(float maxWidth) {
+        float[] columnWidths = new float[table[0].length];
+        float totalWidth = 0;
+        for(int j=0;j<table[0].length;j++){
+            float localMaxWidth = table[0][j].getMinWidth();
+            for(int i=1;i<table.length;i++) if(localMaxWidth<table[i][j].getMinWidth()) localMaxWidth = table[i][j].getMinWidth();
+            columnWidths[j] = localMaxWidth;
+            totalWidth += localMaxWidth;
+        }
+        for(int i=0;i<table[0].length;i++) columnWidths[i] = columnWidths[i] * maxWidth / totalWidth;
+        return columnWidths;
     }
 
     @Override
@@ -116,8 +148,8 @@ public class UnevenTable extends Component implements Cloneable {
     }
 
     @Override
-    public UnevenTable clone() throws CloneNotSupportedException {
-        UnevenTable ret = (UnevenTable) super.clone();
+    public UniformTable clone() throws CloneNotSupportedException {
+        UniformTable ret = (UniformTable) super.clone();
         if(table!=null) {
             ret.table = new Component[table.length][];
             for(int i=0;i<table.length;i++){
@@ -129,5 +161,4 @@ public class UnevenTable extends Component implements Cloneable {
         }
         return ret;
     }
-
 }

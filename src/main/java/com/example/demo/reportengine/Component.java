@@ -20,7 +20,7 @@ public class Component implements Cloneable {
     private boolean filled = false;
     private Color backgroundColor = Color.WHITE;
     private boolean visible = true;
-    @Setter(AccessLevel.NONE)
+    @Setter(AccessLevel.PROTECTED)
     @Getter(AccessLevel.NONE)
     private List<Component> components = new ArrayList<>();
     @Setter(AccessLevel.NONE) protected float minWidth;

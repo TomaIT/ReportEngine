@@ -5,6 +5,8 @@ import com.example.demo.model.ReportJSON;
 import com.example.demo.reportengine.Component;
 import com.example.demo.reportengine.Report;
 import com.example.demo.reportengine.components.TextCell;
+import com.example.demo.reportengine.components.UnevenTable;
+import com.example.demo.reportengine.components.UniformTable;
 import com.example.demo.reportengine.components.properties.HorizontalAlign;
 import com.example.demo.reportengine.components.properties.VerticalAlign;
 import com.example.demo.reportengine.services.FontService;
@@ -129,7 +131,7 @@ public class DemoApplication  implements CommandLineRunner {
 
     private static TextCell createCell(HorizontalAlign align, String text, boolean underline) {
         //6218-5000
-        return new TextCell(text,align, VerticalAlign.center,PDType1Font.HELVETICA,12f,underline,Color.MAGENTA,Color.BLACK,null);
+        return new TextCell(text,align, VerticalAlign.center,PDType1Font.HELVETICA,12f,underline,Color.PINK,Color.BLACK,null);
 
         /*TextCell textCell = new TextCell();
         textCell.setBackground(Color.CYAN);
@@ -173,6 +175,23 @@ public class DemoApplication  implements CommandLineRunner {
         temp[1][0]=createCell(HorizontalAlign.center, "oooooooooooo prova ciao", true);
         return temp;
     }
+    private static Component[][] footer(){
+        Component[][] temp = new Component[1][];
+        temp[0]=new Component[1];
+        temp[0][0]=createCell(HorizontalAlign.center, "FOOTER", false);
+        return temp;
+    }
+
+    private static Component[][] table(int nRow,int nCol,int nChars) {
+        Component[][] table = new Component[nRow][nCol];
+        for(int i=0;i<nRow;i++){
+            for(int j=0;j<nCol;j++){
+                table[i][j]=createCell(HorizontalAlign.center,RandomStringUtils.randomAlphabetic(1,nChars),false);
+            }
+        }
+        table[2][2] = createCell(HorizontalAlign.center,"Ma dai dici che davvero funziona?",true);
+        return table;
+    }
 
     private static void tryByReportJSON() throws IOException, OverlappingException, CloneNotSupportedException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -194,43 +213,31 @@ public class DemoApplication  implements CommandLineRunner {
         //System.out.println("HTML-DONE");
 
         Utility.startTimer("TOTAL");
-        tryByReportJSON();
+        //tryByReportJSON();
         //new PDFTableGenerator().generatePDF(createContent(10,9,12),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
         //prova();
-        //Report report = new Report(PDRectangle.A4,50,50,50,50);
+        Report report = new Report(PDRectangle.A4,50,50,50,50,
+                true,false,false,
+                true,true,true);
 
-        //UnevenTable header = new UnevenTable(header(),Color.RED,null);
-        /*Header.voidHeader(report,25f,Color.GRAY);
-        for(int i=0;i<2;i+=2) {
-            header.addCell(i, );
-            header.addCell(i, );
-            header.addCell(i, );
-            header.addCell(i+1, );
-        }*/
-        //Utility.moveFiles("src/main/resources/fonts/","src/main/resources/googlefonts",Arrays.asList(".ttf", ".otf"));
-        //Utility.downloadFonts("src/main/resources/fonts/");
-        /*COSDictionary a = new COSDictionary();
-        FontFileFinder f = new FontFileFinder();
-        System.out.println(PDType0Font.load(new PDDocument(),new File(f.find().get(15).toString())));*/
-        /*header.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getUpperRightY(),report.getMediaBoxPage().getWidth(),2f);
+        UnevenTable header = new UnevenTable(header(),Color.RED,null);
+        header.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getUpperRightY(),report.getMediaBoxPage().getWidth(),2f);
+        report.setHeader(header);
 
-        report.setFooter(Footer.voidFooter(report,25f,Utility.hex2Rgb("#fe9200")));
-        report.setHeaderInAllPages(header);//Header.voidHeader(report,50f,Color.RED));
+        UnevenTable footer = new UnevenTable(footer(),Color.GREEN,null);
+        footer.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY()+200f,report.getMediaBoxPage().getWidth(),2f);
+        footer.moveTo(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY());
+        report.setFooter(footer);
 
-        report.addPage(Color.BLACK);
-        report.getPages().get(0).addComponent(new Component(new PDRectangle(50,250,report.getMediaBoxPage().getWidth(),11.3f),true,Color.MAGENTA,true,Color.GREEN));
-        System.out.println("START");
-        report.getPages().get(0).addComponent(new Component(report.getPages().get(0).getFirstVoidSpace(),true,Color.GREEN));
-        System.out.println("END");
-        //report.getPages().get(0).addComponent(new Component(report.getPages().get(0).getFirstVoidSpace(),true,Color.MAGENTA));
-        report.addPage(Color.BLACK);
+        report.addContent(new UniformTable(table(10,7,10),Color.CYAN,null));
 
-        //report.getPages().get(1).addComponent(new Component(report.getPages().get(1).getFirstVoidSpace(),true,Color.GREEN));
-        report.addPage(Color.BLACK);
+        report.build();
+
+
         report.render().save("src/main/resources/prove/components_"+System.currentTimeMillis()+".pdf");
 
         //report.getPages().forEach(x->System.out.println(x.getFirstVoidSpace()));
-*/
+
         Utility.stopTimer("TOTAL");
 
         Utility.printTimers();
