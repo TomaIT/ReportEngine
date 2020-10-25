@@ -131,7 +131,7 @@ public class DemoApplication  implements CommandLineRunner {
 
     private static TextCell createCell(HorizontalAlign align, String text, boolean underline) {
         //6218-5000
-        return new TextCell(text,align, VerticalAlign.center,FontService.findFont("Arial"),12f,underline,null,Color.BLACK,null);
+        return new TextCell(text,align, VerticalAlign.center,FontService.findFont("Arial"),12f,underline,Color.PINK,Color.BLACK,null);
 
         /*TextCell textCell = new TextCell();
         textCell.setBackground(Color.CYAN);

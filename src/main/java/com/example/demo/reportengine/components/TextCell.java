@@ -204,7 +204,7 @@ public class TextCell extends Component implements Cloneable {
         float totHeight = height * values.length;
         for (int i=0;i<values.length;i++) {
             TextCell temp = new TextCell(values[i],horizontalAlign,verticalAlign,fontType,fontSize, underline,
-                    null,
+                    getBorderColor(), // TODO null
                     textColor,null);
             //Return always false
             temp.build(startX,endY-i*height,maxWidth,height);
