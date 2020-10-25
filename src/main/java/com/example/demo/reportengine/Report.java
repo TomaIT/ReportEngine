@@ -126,11 +126,11 @@ public class Report {
     public PDDocument render() throws IOException {
         if(pages.size()<=0) throw new RuntimeException("Must be call build() before rendering. pages.size is 0.");
         PDDocument pdDocument = new PDDocument();
-        for(Component component : pages){
+        for(Page componentPage : pages){
             PDPage page = new PDPage(formatPage);
             pdDocument.addPage(page);
-            PDPageContentStream contentStream = new PDPageContentStream(pdDocument, page, PDPageContentStream.AppendMode.OVERWRITE, true);
-            component.render(contentStream);
+            PDPageContentStream contentStream = new PDPageContentStream(pdDocument, page, PDPageContentStream.AppendMode.OVERWRITE, false);
+            componentPage.render(contentStream);
             contentStream.close();
         }
         return pdDocument;
