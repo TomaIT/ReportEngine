@@ -15,11 +15,11 @@ public class Page extends Component implements Cloneable {
     public Page(PDRectangle pdRectangle, Component header, Component footer) throws OverlappingException, CloneNotSupportedException {
         super(pdRectangle);
         if (header!=null) {
-            this.header = header.clone();//SerializationUtils.clone(header);//new UnevenTable((UnevenTable) header);
+            this.header = header.clone();
             addComponent(this.header);
         }
         if (footer!=null){
-            this.footer = footer.clone();//SerializationUtils.clone(footer);//new UnevenTable((UnevenTable) footer);
+            this.footer = footer.clone();
             addComponent(this.footer);
         }
     }
@@ -29,6 +29,7 @@ public class Page extends Component implements Cloneable {
         Page ret = (Page) super.clone();
         if (header!=null) ret.header = header.clone();
         if (footer!=null) ret.footer = footer.clone();
+        ret.full = full;
         return ret;
     }
 }

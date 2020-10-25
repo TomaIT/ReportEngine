@@ -23,8 +23,8 @@ public class Component implements Cloneable {
     @Setter(AccessLevel.PROTECTED)
     @Getter(AccessLevel.NONE)
     private List<Component> components = new ArrayList<>();
-    @Setter(AccessLevel.NONE) protected float minWidth;
-    @Setter(AccessLevel.NONE) protected float minHeight;
+    @Setter(AccessLevel.NONE) private float minWidth;
+    @Setter(AccessLevel.NONE) private float minHeight;
     private boolean splittable = false;
 
     public Component(float startX,float startY,float width,float height){
@@ -175,6 +175,8 @@ public class Component implements Cloneable {
         ret.backgroundColor = backgroundColor;
         ret.minWidth = minWidth;
         ret.minHeight = minHeight;
+        ret.splittable = splittable;
+        ret.visible = visible;
         List<Component> list = new ArrayList<>();
         for (Component component : components) {
             Component clone = component.clone();

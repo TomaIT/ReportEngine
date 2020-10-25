@@ -31,13 +31,12 @@ public class TextCell extends Component implements Cloneable {
     private float fontSize = 12f;
     private boolean underline = false;
     private Color textColor = Color.BLACK;
-    @Setter(AccessLevel.NONE) private float textWidth;
-    @Setter(AccessLevel.NONE) private float textHeight;
+    @Setter(AccessLevel.NONE) private boolean textArea = false;
 
     public TextCell() {
         super();
-        updateHeights();
-        updateWidths();
+        //updateHeights();
+        //updateWidths();
     }
     public TextCell(String value, HorizontalAlign horizontalAlign, VerticalAlign verticalAlign, PDFont fontType,
                     float fontSize, boolean underline, Color borderColor, Color textColor, Color backgroundColor) {
@@ -49,27 +48,36 @@ public class TextCell extends Component implements Cloneable {
         this.fontSize = fontSize;
         this.underline = underline;
         this.textColor = textColor == null ? Color.BLACK : textColor;
-        updateHeights();
-        updateWidths();
+        //updateHeights();
+        //updateWidths();
     }
 
-    public void setFontSize(float fontSize) {
-        this.fontSize = fontSize;
-        updateWidths();
-        updateHeights();
+    @Override
+    public float getMinHeight() {
+        float textHeight = getTextHeight();
+        if(textArea) {
+            return (float) getComponents().stream().mapToDouble(Component::getMinHeight).sum();
+        }
+        return (underline) ?
+                textHeight + minMarginText*2 + (fontSize*underlineWidthFactor) + (fontSize*underlineMarginFactor) :
+                textHeight + minMarginText*2;
     }
-    public void setValue(String value) {
-        this.value = value;
-        updateWidths();
+
+    @Override
+    public float getMinWidth() {
+        float textWidth = getTextWidth();
+        if(textArea) {
+            return (float) getComponents().stream().mapToDouble(Component::getMinWidth).max().orElse(0);
+        }
+        return textWidth + minMarginText*2;
     }
-    public void setFontType(PDFont fontType) {
-        this.fontType = fontType;
-        updateWidths();
-        updateHeights();
+
+    public float getTextHeight() {
+        return (value == null || value.isBlank() || textArea) ? 0 : FontService.getHeight(fontType,fontSize);
     }
-    public void setUnderline(boolean underline) {
-        this.underline = underline;
-        updateHeights();
+
+    public float getTextWidth() {
+        return  (value == null || value.isBlank() || textArea) ? 0 : FontService.getWidth(value,fontType,fontSize);
     }
 
     /**
@@ -83,61 +91,33 @@ public class TextCell extends Component implements Cloneable {
      */
     @Override
     public boolean build(float startX,float endY,float maxWidth,float minHeight) throws CloneNotSupportedException {
-        if(minHeight < this.minHeight) throw new RuntimeException("TextCell height isn't sufficient.");
-
+        if(minHeight < getMinHeight()) throw new RuntimeException("TextCell height isn't sufficient.");
+        if (textArea) {// Ricalcolo dall'inizio
+            textArea=false;
+            setPdRectangle(null);
+            getComponents().clear();
+        }
         String[] split = value.split("\\s+");
-        if (minWidth > maxWidth) {
-            if (split.length > 1) return buildAreaText(startX,endY,maxWidth,minHeight,split);
+        if (getMinWidth() > maxWidth) {
+            if (split.length > 1) return buildTextArea(startX,endY,maxWidth,minHeight,split);
             setValue(shortens(value,maxWidth,fontType,fontSize));
         }
-        //se areaText necessita riposizionamento e ridimensionamento sulla y
-        repositionAreaText(endY,minHeight);
         setPdRectangle(new PDRectangle(startX,endY-minHeight,maxWidth,minHeight));
         return false;
-    }
-
-    private void repositionAreaText(float endY,float height) {
-        if(getComponents().size()>0) {
-            float offset;
-            boolean isAlreadyChanged;
-            float minY = (float) getComponents().stream().mapToDouble(x->x.getPdRectangle().getLowerLeftY()).min().orElse(-1);
-            float maxY = (float) getComponents().stream().mapToDouble(x->x.getPdRectangle().getUpperRightY()).max().orElse(-1);
-            switch (verticalAlign) {
-                case top:
-                    offset = 0;
-                    isAlreadyChanged = (maxY == endY);
-                    break;
-                case bottom:
-                    offset = height-this.minHeight;
-                    isAlreadyChanged = (minY == endY-height);
-                    break;
-                case center:
-                    offset = (height-this.minHeight) / 2;
-                    isAlreadyChanged = (maxY == endY-offset);
-                    break;
-                default:
-                    throw new RuntimeException("Not yet implemented VerticalAlign: "+verticalAlign);
-            }
-            //Prima verifico che il cambiamento non sia già stato fatto
-            if (!isAlreadyChanged) {
-                for (Component c : getComponents()) {
-                    c.moveTo(c.getPdRectangle().getLowerLeftX(),c.getPdRectangle().getLowerLeftY()-offset);
-                }
-            }
-        }
     }
 
     @Override
     protected void renderWithoutComponents(PDPageContentStream pdPageContentStream) throws IOException {
         if(!isVisible())return;
         super.renderWithoutComponents(pdPageContentStream);
-        if (value != null && !value.isBlank()) {
+        if (value != null && !value.isBlank() && !textArea) {
             pdPageContentStream.setNonStrokingColor(textColor);
             pdPageContentStream.beginText();
-            //System.out.println(fontType.getName()+" - "+fontSize);
             pdPageContentStream.setFont(fontType,fontSize);
             float x ;
             float y ;
+            float textWidth = getTextWidth();
+            float textHeight = getTextHeight();
             switch (horizontalAlign) {
                 case left: x = getPdRectangle().getLowerLeftX() + minMarginText; break;
                 case right: x = getPdRectangle().getUpperRightX() - minMarginText - textWidth; break;
@@ -165,75 +145,11 @@ public class TextCell extends Component implements Cloneable {
             }
         }
     }
-
     @Override
     public void render(PDPageContentStream pdPageContentStream) throws IOException {
         if(!isVisible())return;
         renderWithoutComponents(pdPageContentStream);
         for(Component component : getComponents()) component.render(pdPageContentStream);
-    }
-
-
-    private void updateHeights() {
-        textHeight = (value == null || value.isBlank()) ? 0 : FontService.getHeight(fontType,fontSize);
-        minHeight = (getPdRectangle() != null && getPdRectangle().getHeight()>=textHeight + minMarginText*2) ?
-                getPdRectangle().getHeight() :
-                (underline) ?
-                        textHeight + minMarginText*2 + (fontSize*underlineWidthFactor) + (fontSize*underlineMarginFactor) :
-                        textHeight + minMarginText*2;
-    }
-    private void updateWidths() {
-        textWidth = (value == null || value.isBlank()) ? 0 : FontService.getWidth(value,fontType,fontSize);
-        minWidth = (getPdRectangle() != null) ?
-                getPdRectangle().getWidth() :
-                textWidth + minMarginText*2;
-    }
-
-    private String shortens(String value,float maxWidth,PDFont fontType,float fontSize) { // TODO inefficient performance
-        final int nCharsSubstitute = 3;
-        while (FontService.getWidth(value,fontType,fontSize) > maxWidth) {
-            value = value.substring(0, value.length() - nCharsSubstitute).replaceFirst(".{"+nCharsSubstitute+"}$", "...");
-        }
-        return value;
-    }
-
-    private String[] buildStringsWithMaxWidth(String[] split,float maxWidth,PDFont fontType,float fontSize) {
-        List<String> retValue = new ArrayList<>();
-        for (int i=0;i<split.length;i++) {
-            String value = split[i];
-            if (FontService.getWidth(value,fontType,fontSize) > maxWidth) {
-                value = shortens(value,maxWidth,fontType,fontSize);
-            } else {
-                for(int j=i+1;j<split.length;j++){
-                    if(FontService.getWidth(value+" "+split[j],fontType,fontSize) > maxWidth) break;
-                    value += " "+split[j];
-                    i++;
-                }
-            }
-            retValue.add(value);
-        }
-        return retValue.toArray(new String[0]);
-    }
-
-    private boolean buildAreaText(float startX,float endY,float maxWidth,float minHeight,String[] split) throws CloneNotSupportedException {
-        List<TextCell> cells = new ArrayList<>();
-        String[] values = buildStringsWithMaxWidth(split,maxWidth,fontType,fontSize);
-        float tempHeight = minHeight/values.length;
-        float height = (this.minHeight<tempHeight) ? tempHeight : this.minHeight;
-        float totHeight = height * values.length;
-        for (int i=0;i<values.length;i++) {
-            TextCell temp = this.clone();//SerializationUtils.clone(this);//new TextCell(this);
-            temp.setValue(values[i]);
-            //Return always false
-            temp.build(startX,endY-i*height,maxWidth,height);
-            cells.add(temp);
-        }
-
-        setPdRectangle(new PDRectangle(startX,endY-totHeight,maxWidth,totHeight));
-        cells.forEach(x->getComponents().add(x));
-        setValue("");
-        setUnderline(false);
-        return true;// Return always true because is changed height (rowMargin of father component isn't considered)
     }
 
     @Override
@@ -246,8 +162,64 @@ public class TextCell extends Component implements Cloneable {
         textCell.fontSize = fontSize;
         textCell.underline = underline;
         textCell.textColor = new Color(textColor.getRGB());
-        textCell.updateHeights();
-        textCell.updateWidths();
+        textCell.textArea = textArea;
+        //textCell.textHeight = textHeight;
+        //textCell.textWidth = textWidth;
+        //textCell.updateHeights();
+        //textCell.updateWidths();
         return textCell;
+    }
+
+    private String shortens(String value,float maxWidth,PDFont fontType,float fontSize) { // TODO inefficient performance
+        final int nCharsSubstitute = 3;
+        while (FontService.getWidth(value,fontType,fontSize) > maxWidth) {
+            value = value.substring(0, value.length() - nCharsSubstitute).replaceFirst(".{"+nCharsSubstitute+"}$", "...");
+        }
+        return value;
+    }
+
+    // TODO TextArea nearest
+    private String[] buildStringsWithMaxWidth(String[] split,float maxWidth,PDFont fontType,float fontSize) {
+        List<String> retValue = new ArrayList<>();
+        for (int i=0;i<split.length;i++) {
+            String value = split[i];
+            if (FontService.getWidth(value,fontType,fontSize) > maxWidth) {
+                value = shortens(value,maxWidth,fontType,fontSize);
+            } else {
+                for(int j=i+1;j<split.length;j++){
+                    if(FontService.getWidth(value+" "+split[j],fontType,fontSize) + minMarginText*2 > maxWidth) break;
+                    value += " "+split[j];
+                    i++;
+                }
+            }
+            retValue.add(value);
+        }
+        return retValue.toArray(new String[0]);
+    }
+    private boolean buildTextArea(float startX,float endY,float maxWidth,float minHeight,String[] split) throws CloneNotSupportedException {
+        List<TextCell> cells = new ArrayList<>();
+        String[] values = buildStringsWithMaxWidth(split,maxWidth,fontType,fontSize);
+        float tempHeight = minHeight/values.length;
+        float height = (getMinHeight()<tempHeight) ? tempHeight : getMinHeight();
+        float totHeight = height * values.length;
+        for (int i=0;i<values.length;i++) {
+            TextCell temp = new TextCell(values[i],horizontalAlign,verticalAlign,fontType,fontSize, underline,
+                    null,
+                    textColor,null);
+            //Return always false
+            temp.build(startX,endY-i*height,maxWidth,height);
+            cells.add(temp);
+        }
+
+        setPdRectangle(new PDRectangle(startX,endY-totHeight,maxWidth,totHeight));
+        getComponents().clear();
+        cells.forEach(x->getComponents().add(x));
+        textArea = true;
+        //updateWidths();
+        //updateHeights();
+        //setValue("");
+        //setUnderline(false);
+        System.out.println(getMinHeight()+" - "+minHeight);
+        return getMinHeight()>minHeight;// Return always true because is changed height (rowMargin of father component isn't considered)
     }
 }

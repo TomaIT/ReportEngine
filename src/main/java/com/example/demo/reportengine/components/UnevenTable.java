@@ -41,6 +41,7 @@ public class UnevenTable extends Component implements Cloneable {
      */
     @Override
     public float buildNoMinHeight(float startX, float endY, float maxWidth, float topMargin) throws CloneNotSupportedException {
+        getComponents().clear();
         float sumHeight = topMargin;
         float tempEndY = endY - topMargin;
         for(int i=0;i<table.length;i++){

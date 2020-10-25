@@ -45,29 +45,35 @@ public class UniformTable extends Component implements Cloneable {
      */
     @Override
     public float buildNoMinHeight(float startX, float endY, float maxWidth, float topMargin) throws CloneNotSupportedException {
-        float sumHeight = topMargin;
-        float tempEndY = endY-topMargin;
+        getComponents().clear();
+        float sumHeight;
         int i,j;
-        float[] columnWidth = getColumnWidths(maxWidth);
-        for (i = 0; i < table.length; i++) {
-            Component[] row = table[i];
-            if (row.length <= 0) throw new RuntimeException("Cell row is void");
-            float offsetX = 0;
-            for (j = 0; j < row.length; j++) {
-                boolean isChanged = row[j].build(
-                        startX + offsetX,
-                        tempEndY,
-                        columnWidth[j],
-                        getMinHeightRow(row));
-                offsetX += columnWidth[j];
-                if (isChanged) {
-                    j = -1;
-                    offsetX = 0;
+        do {
+            float[] columnWidth = getColumnWidths(maxWidth);
+            sumHeight = topMargin;
+            float tempEndY = endY - topMargin;
+            for (i = 0; i < table.length; i++) {
+                Component[] row = table[i];
+                if (row.length <= 0) throw new RuntimeException("Cell row is void");
+                float offsetX = 0;
+                for (j = 0; j < row.length; j++) {
+                    boolean isChanged = row[j].build(
+                            startX + offsetX,
+                            tempEndY,
+                            columnWidth[j],
+                            getMinHeightRow(row));
+                    offsetX += columnWidth[j];
+                    if (isChanged) {
+                        break;
+                        /*j = -1;
+                        offsetX = 0;*/
+                    }
                 }
+                if (j!=row.length) break;
+                tempEndY -= row[0].getPdRectangle().getHeight();
+                sumHeight += row[0].getPdRectangle().getHeight();
             }
-            tempEndY -= row[0].getPdRectangle().getHeight();
-            sumHeight += row[0].getPdRectangle().getHeight();
-        }
+        }while (i!=table.length);
         setPdRectangle(new PDRectangle(startX,endY-sumHeight,maxWidth,sumHeight));
         Arrays.stream(table).forEach(x-> Arrays.stream(x).forEach(y-> getComponents().add(y)));
         return sumHeight;

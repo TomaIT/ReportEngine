@@ -131,7 +131,7 @@ public class DemoApplication  implements CommandLineRunner {
 
     private static TextCell createCell(HorizontalAlign align, String text, boolean underline) {
         //6218-5000
-        return new TextCell(text,align, VerticalAlign.center,FontService.findFont("Arial"),12f,underline,Color.PINK,Color.BLACK,null);
+        return new TextCell(text,align, VerticalAlign.center,FontService.findFont("Arial"),12f,underline,null,Color.BLACK,null);
 
         /*TextCell textCell = new TextCell();
         textCell.setBackground(Color.CYAN);
@@ -189,7 +189,7 @@ public class DemoApplication  implements CommandLineRunner {
                 table[i][j]=createCell(HorizontalAlign.center,RandomStringUtils.randomAlphabetic(1,nChars),false);
             }
         }
-        table[2][2] = createCell(HorizontalAlign.center,"Ma dai dici che davvero funziona?",true);
+        table[2][2] = createCell(HorizontalAlign.center,"Ma dai dici che davvero funziona? ullalala",true);
         return table;
     }
 
@@ -231,7 +231,7 @@ public class DemoApplication  implements CommandLineRunner {
 
         report.addContent(new UniformTable(table(10,7,10),Color.CYAN,null));
         report.addContent(new UniformTable(table(15,4,10),Color.GREEN,null));
-        report.addContent(new UniformTable(table(30,4,10),Color.ORANGE,null));
+        report.addContent(new UniformTable(table(3,4,10),Color.ORANGE,null));
         report.addContent(new UniformTable(table(30,4,10),Color.GREEN,null));
 
         report.build();
