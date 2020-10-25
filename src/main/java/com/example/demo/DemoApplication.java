@@ -131,7 +131,7 @@ public class DemoApplication  implements CommandLineRunner {
 
     private static TextCell createCell(HorizontalAlign align, String text, boolean underline) {
         //6218-5000
-        return new TextCell(text,align, VerticalAlign.center,PDType1Font.HELVETICA,12f,underline,Color.PINK,Color.BLACK,null);
+        return new TextCell(text,align, VerticalAlign.center,FontService.findFont("Arial"),12f,underline,Color.PINK,Color.BLACK,null);
 
         /*TextCell textCell = new TextCell();
         textCell.setBackground(Color.CYAN);
@@ -217,19 +217,21 @@ public class DemoApplication  implements CommandLineRunner {
         //new PDFTableGenerator().generatePDF(createContent(10,9,12),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
         //prova();
         Report report = new Report(PDRectangle.A4,50,50,50,50,
-                true,false,false,
+                true,true,true,
                 true,true,true);
 
         UnevenTable header = new UnevenTable(header(),Color.RED,null);
-        header.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getUpperRightY(),report.getMediaBoxPage().getWidth());
+        //header.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getUpperRightY(),report.getMediaBoxPage().getWidth());
         report.setHeader(header);
 
         UnevenTable footer = new UnevenTable(footer(),Color.GREEN,null);
-        footer.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY()+200f,report.getMediaBoxPage().getWidth());
-        footer.moveTo(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY());
+        //footer.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY()+200f,report.getMediaBoxPage().getWidth());
+        //footer.moveTo(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY());
         report.setFooter(footer);
 
         report.addContent(new UniformTable(table(10,7,10),Color.CYAN,null));
+        report.addContent(new UniformTable(table(15,4,10),Color.GREEN,null));
+        report.addContent(new UniformTable(table(30,4,10),Color.ORANGE,null));
 
         report.build();
 

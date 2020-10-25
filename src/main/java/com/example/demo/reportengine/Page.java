@@ -10,6 +10,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 public class Page extends Component implements Cloneable {
     private Component header;
     private Component footer;
+    private boolean full = false;
 
     public Page(PDRectangle pdRectangle, Component header, Component footer) throws OverlappingException, CloneNotSupportedException {
         super(pdRectangle);

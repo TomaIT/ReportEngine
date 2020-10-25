@@ -44,9 +44,9 @@ public class UniformTable extends Component implements Cloneable {
      * @return height
      */
     @Override
-    public float build(float startX,float endY,float maxWidth) throws CloneNotSupportedException {
-        float sumHeight = 0;
-        float tempEndY = endY;
+    public float buildNoMinHeight(float startX, float endY, float maxWidth, float topMargin) throws CloneNotSupportedException {
+        float sumHeight = topMargin;
+        float tempEndY = endY-topMargin;
         int i,j;
         float[] columnWidth = getColumnWidths(maxWidth);
         for (i = 0; i < table.length; i++) {

@@ -134,6 +134,7 @@ public class TextCell extends Component implements Cloneable {
         if (value != null && !value.isBlank()) {
             pdPageContentStream.setNonStrokingColor(textColor);
             pdPageContentStream.beginText();
+            System.out.println(fontType.getName()+" - "+fontSize);
             pdPageContentStream.setFont(fontType,fontSize);
             float x ;
             float y ;

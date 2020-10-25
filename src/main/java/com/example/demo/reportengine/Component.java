@@ -25,6 +25,7 @@ public class Component implements Cloneable {
     private List<Component> components = new ArrayList<>();
     @Setter(AccessLevel.NONE) protected float minWidth;
     @Setter(AccessLevel.NONE) protected float minHeight;
+    private boolean splittable = false;
 
     public Component(float startX,float startY,float width,float height){
         this.pdRectangle = new PDRectangle(startX,startY,width,height);
@@ -140,7 +141,7 @@ public class Component implements Cloneable {
      * @return height
      * @throws CloneNotSupportedException
      */
-    public float build(float startX, float endY,float maxWidth) throws CloneNotSupportedException {
+    public float buildNoMinHeight(float startX, float endY,float maxWidth,float topMargin) throws CloneNotSupportedException {
         throw new RuntimeException("Not Implemented");
     }
 

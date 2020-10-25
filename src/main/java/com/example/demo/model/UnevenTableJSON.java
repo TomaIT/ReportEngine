@@ -25,7 +25,7 @@ public class UnevenTableJSON {
             }
         }
         UnevenTable unevenTable = new UnevenTable(components, Color.RED,null);
-        unevenTable.build(startX,endY,maxWidth);
+        unevenTable.buildNoMinHeight(startX,endY,maxWidth,0);
         return unevenTable;
     }
 }

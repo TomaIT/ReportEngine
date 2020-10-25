@@ -12,12 +12,14 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Data
 public class Report {
-    // Page attributes
     @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE) private PDRectangle formatPage;
+    @Setter(AccessLevel.NONE) private static final float minComponentMargin = 15f;
+    @Setter(AccessLevel.NONE) private static final float minVoidSpace = minComponentMargin*2 + 50f;
     private PDRectangle mediaBoxPage;
     private Component header = null;
     private Component footer = null;
@@ -27,7 +29,7 @@ public class Report {
     private boolean footerFirstPage;
     private boolean footerContentPage;
     private boolean footerLastPage;
-    private List<Component> contents = new ArrayList<>();
+    private List<Component> contents = new LinkedList<>();
     //Pages is builded by build() method
     @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE) private List<Page> pages = new ArrayList<>();
 
@@ -50,16 +52,50 @@ public class Report {
     }
 
     /**
-     * Method that makes the pages and split or refactor the components
+     * Method that makes the pages and split or refactor the components.
      */
     public void build() throws OverlappingException, CloneNotSupportedException {
+        if (header!=null) header.buildNoMinHeight(mediaBoxPage.getLowerLeftX(),mediaBoxPage.getUpperRightY(),mediaBoxPage.getWidth(),0);
+        if (footer!=null) {
+            footer.buildNoMinHeight(mediaBoxPage.getLowerLeftX(),header.getPdRectangle().getLowerLeftY(),mediaBoxPage.getWidth(),0);
+            footer.moveTo(mediaBoxPage.getLowerLeftX(),mediaBoxPage.getLowerLeftY());
+        }
+
         pages.add(new Page(mediaBoxPage,header,footer));
 
-        //TODO creazione dinamica :)
 
-        PDRectangle voidSpace = pages.get(0).getFirstVoidSpace();
-        contents.get(0).build(voidSpace.getLowerLeftX(),voidSpace.getUpperRightY()-10f,voidSpace.getWidth());
-        pages.get(0).addComponent(contents.get(0));
+        boolean loop = false;
+        while (!contents.isEmpty()) {
+            Component content = contents.get(0);
+            boolean contentEntered = false;
+            for(int i=0;i<pages.size();i++) {
+                Page page = pages.get(i);
+                if(page.isFull())continue;
+                PDRectangle voidSpace = page.getFirstVoidSpace();
+                if(voidSpace.getHeight() <= minVoidSpace) {
+                    page.setFull(true);
+                    continue;
+                }
+
+                float height = content.buildNoMinHeight(voidSpace.getLowerLeftX(),voidSpace.getUpperRightY(),voidSpace.getWidth(),minComponentMargin);
+                if (height <= voidSpace.getHeight()) { // Perfetto il componente ci sta
+                    page.addComponent(content);
+                    contentEntered = true;
+                    contents.remove(0);
+                } else { // Il componente non ci sta nello spazio dedicato, bisogna applicare split se possibile oppure creiamo nuova pagina, se nella nuova pagina non ci sta crash
+                    //TODO
+                    page.setFull(true);
+                    //throw new RuntimeException("NOT IMPLEMENTED SPLIT");
+                }
+            }
+            if(!contentEntered) { // C'è bisogno di una nuova pagina
+                if(loop) throw new RuntimeException("Enter this component is impossible. "+content);
+                pages.add(new Page(mediaBoxPage,header,footer));
+                loop = true;
+            } else {
+                loop = false;
+            }
+        }
 
 
 
