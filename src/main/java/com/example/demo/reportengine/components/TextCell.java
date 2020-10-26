@@ -31,7 +31,7 @@ public class TextCell extends Component implements Cloneable {
     private float fontSize = 12f;
     private boolean underline = false;
     private Color textColor = Color.BLACK;
-    @Setter(AccessLevel.NONE) private boolean textArea = false;
+    //@Setter(AccessLevel.NONE) private boolean textArea = false;
 
     public TextCell() {
         super();
@@ -55,9 +55,9 @@ public class TextCell extends Component implements Cloneable {
     @Override
     public float getMinHeight() {
         float textHeight = getTextHeight();
-        if(textArea) {
+        /*if(textArea) {
             return (float) getComponents().stream().mapToDouble(Component::getMinHeight).sum();
-        }
+        }*/
         return (underline) ?
                 textHeight + minMarginText*2 + (fontSize*underlineWidthFactor) + (fontSize*underlineMarginFactor) :
                 textHeight + minMarginText*2;
@@ -66,18 +66,18 @@ public class TextCell extends Component implements Cloneable {
     @Override
     public float getMinWidth() {
         float textWidth = getTextWidth();
-        if(textArea) {
+        /*if(textArea) {
             return (float) getComponents().stream().mapToDouble(Component::getMinWidth).max().orElse(0);
-        }
+        }*/
         return textWidth + minMarginText*2;
     }
 
     public float getTextHeight() {
-        return (value == null || value.isBlank() || textArea) ? 0 : FontService.getHeight(fontType,fontSize);
+        return (value == null || value.isBlank() /*|| textArea*/) ? 0 : FontService.getHeight(fontType,fontSize);
     }
 
     public float getTextWidth() {
-        return  (value == null || value.isBlank() || textArea) ? 0 : FontService.getWidth(value,fontType,fontSize);
+        return  (value == null || value.isBlank() /*|| textArea*/) ? 0 : FontService.getWidth(value,fontType,fontSize);
     }
 
     /**
@@ -92,14 +92,14 @@ public class TextCell extends Component implements Cloneable {
     @Override
     public boolean build(float startX,float endY,float maxWidth,float minHeight) throws CloneNotSupportedException {
         if(minHeight < getMinHeight()) throw new RuntimeException("TextCell height isn't sufficient.");
-        if (textArea) {// Ricalcolo dall'inizio
+        /*if (textArea) {// Ricalcolo dall'inizio
             textArea=false;
             setPdRectangle(null);
             getComponents().clear();
-        }
-        String[] split = value.split("\\s+");
+        }*/
+        //String[] split = value.split("\\s+");
         if (getMinWidth() > maxWidth) {
-            if (split.length > 1) return buildTextArea(startX,endY,maxWidth,minHeight,split);
+            //if (split.length > 1) return buildTextArea(startX,endY,maxWidth,minHeight,split);
             setValue(shortens(value,maxWidth,fontType,fontSize));
         }
         setPdRectangle(new PDRectangle(startX,endY-minHeight,maxWidth,minHeight));
@@ -110,7 +110,7 @@ public class TextCell extends Component implements Cloneable {
     protected void renderWithoutComponents(PDPageContentStream pdPageContentStream) throws IOException {
         if(!isVisible())return;
         super.renderWithoutComponents(pdPageContentStream);
-        if (value != null && !value.isBlank() && !textArea) {
+        if (value != null && !value.isBlank() /*&& !textArea*/) {
             pdPageContentStream.setNonStrokingColor(textColor);
             pdPageContentStream.beginText();
             pdPageContentStream.setFont(fontType,fontSize);
@@ -162,7 +162,7 @@ public class TextCell extends Component implements Cloneable {
         textCell.fontSize = fontSize;
         textCell.underline = underline;
         textCell.textColor = new Color(textColor.getRGB());
-        textCell.textArea = textArea;
+        //textCell.textArea = textArea;
         //textCell.textHeight = textHeight;
         //textCell.textWidth = textWidth;
         //textCell.updateHeights();
@@ -172,18 +172,18 @@ public class TextCell extends Component implements Cloneable {
 
     private String shortens(String value,float maxWidth,PDFont fontType,float fontSize) { // TODO inefficient performance
         final int nCharsSubstitute = 3;
-        while (FontService.getWidth(value,fontType,fontSize) > maxWidth) {
+        while (FontService.getWidth(value,fontType,fontSize)+ minMarginText*2 > maxWidth) {
             value = value.substring(0, value.length() - nCharsSubstitute).replaceFirst(".{"+nCharsSubstitute+"}$", "...");
         }
         return value;
     }
 
     // TODO TextArea nearest
-    private String[] buildStringsWithMaxWidth(String[] split,float maxWidth,PDFont fontType,float fontSize) {
+    /*private String[] buildStringsWithMaxWidth(String[] split,float maxWidth,PDFont fontType,float fontSize) {
         List<String> retValue = new ArrayList<>();
         for (int i=0;i<split.length;i++) {
             String value = split[i];
-            if (FontService.getWidth(value,fontType,fontSize) > maxWidth) {
+            if (FontService.getWidth(value,fontType,fontSize)+ minMarginText*2 > maxWidth) {
                 value = shortens(value,maxWidth,fontType,fontSize);
             } else {
                 for(int j=i+1;j<split.length;j++){
@@ -221,5 +221,5 @@ public class TextCell extends Component implements Cloneable {
         //setUnderline(false);
         System.out.println(getMinHeight()+" - "+minHeight);
         return getMinHeight()>minHeight;// Return always true because is changed height (rowMargin of father component isn't considered)
-    }
+    }*/
 }

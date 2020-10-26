@@ -232,7 +232,7 @@ public class DemoApplication  implements CommandLineRunner {
         report.addContent(new UniformTable(table(10,7,10),Color.CYAN,null));
         report.addContent(new UniformTable(table(15,4,10),Color.GREEN,null));
         report.addContent(new UniformTable(table(3,4,10),Color.ORANGE,null));
-        report.addContent(new UniformTable(table(30,4,10),Color.GREEN,null));
+        report.addContent(new UniformTable(table(15,4,10),Color.GREEN,null));
 
         report.build();
 

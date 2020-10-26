@@ -13,7 +13,7 @@ import java.util.Arrays;
 @Data
 public class UniformTable extends Component implements Cloneable {
     @Setter(AccessLevel.NONE)
-    private static final float rowMinMargin = 5f;
+    private static final float rowMinMargin = 15f;
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private Component[][] table;
