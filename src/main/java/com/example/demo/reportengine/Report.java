@@ -104,17 +104,15 @@ public class Report {
     }
 
     private void setHeaderAndFooterVisibilities() {
-        if(pages.size()>0){
-            pages.get(0).getHeader().setVisible(headerFirstPage);
-            pages.get(0).getFooter().setVisible(footerFirstPage);
+        if(header!=null) {
+            if(pages.size()>0) pages.get(0).getHeader().setVisible(headerFirstPage);
+            for(int i=1;i<pages.size()-1;i++) pages.get(i).getHeader().setVisible(headerContentPage);
+            if(pages.size()>1) pages.get(pages.size()-1).getHeader().setVisible(headerLastPage);
         }
-        if(pages.size()>1) {
-            pages.get(pages.size()-1).getHeader().setVisible(headerLastPage);
-            pages.get(pages.size()-1).getFooter().setVisible(footerLastPage);
-        }
-        for(int i=1;i<pages.size()-1;i++){
-            pages.get(i).getHeader().setVisible(headerContentPage);
-            pages.get(i).getFooter().setVisible(footerContentPage);
+        if(footer!=null) {
+            if(pages.size()>0) pages.get(0).getFooter().setVisible(footerFirstPage);
+            for(int i=1;i<pages.size()-1;i++) pages.get(i).getFooter().setVisible(footerContentPage);
+            if(pages.size()>1) pages.get(pages.size()-1).getFooter().setVisible(footerLastPage);
         }
     }
 

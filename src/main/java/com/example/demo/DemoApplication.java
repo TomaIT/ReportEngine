@@ -227,12 +227,12 @@ public class DemoApplication  implements CommandLineRunner {
         UnevenTable footer = new UnevenTable(footer(),Color.GREEN,null);
         //footer.build(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY()+200f,report.getMediaBoxPage().getWidth());
         //footer.moveTo(report.getMediaBoxPage().getLowerLeftX(),report.getMediaBoxPage().getLowerLeftY());
-        report.setFooter(footer);
+        //report.setFooter(footer);
 
-        report.addContent(new UniformTable(table(10,7,10),Color.CYAN,null));
-        report.addContent(new UniformTable(table(15,4,10),Color.GREEN,null));
-        report.addContent(new UniformTable(table(3,4,10),Color.ORANGE,null));
-        report.addContent(new UniformTable(table(15,4,10),Color.GREEN,null));
+//        report.addContent(new UniformTable(table(10,7,10),Color.CYAN,null));
+//        report.addContent(new UniformTable(table(15,4,10),Color.GREEN,null));
+//        report.addContent(new UniformTable(table(3,4,10),Color.ORANGE,null));
+//        report.addContent(new UniformTable(table(15,4,10),Color.GREEN,null));
 
         report.build();
 
