@@ -133,6 +133,14 @@ public class Component implements Cloneable {
         throw new RuntimeException("Not Implemented");
     }
 
+    public void buildMaxWidth(float maxWidth) throws CloneNotSupportedException {
+        throw new RuntimeException("Not Implemented");
+    }
+
+    public void adjust(float startX,float endY,float height,float width) throws OverlappingException {
+
+    }
+
     /**
      *
      * @param startX
@@ -141,7 +149,7 @@ public class Component implements Cloneable {
      * @return height
      * @throws CloneNotSupportedException
      */
-    public float buildNoMinHeight(float startX, float endY,float maxWidth,float topMargin) throws CloneNotSupportedException {
+    public float buildNoMinHeight(float startX, float endY,float maxWidth,float topMargin) throws CloneNotSupportedException, OverlappingException {
         throw new RuntimeException("Not Implemented");
     }
 

@@ -1,5 +1,6 @@
 package com.example.demo.reportengine.components;
 
+import com.example.demo.exceptions.OverlappingException;
 import com.example.demo.reportengine.Component;
 import lombok.*;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 @Data
 public class UniformTable extends Component implements Cloneable {
     @Setter(AccessLevel.NONE)
-    private static final float rowMinMargin = 15f;
+    private static final float rowMinMargin = 10f;
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private Component[][] table;
@@ -44,36 +45,35 @@ public class UniformTable extends Component implements Cloneable {
      * @return height
      */
     @Override
-    public float buildNoMinHeight(float startX, float endY, float maxWidth, float topMargin) throws CloneNotSupportedException {
+    public float buildNoMinHeight(float startX, float endY, float maxWidth, float topMargin) throws CloneNotSupportedException, OverlappingException {
         getComponents().clear();
-        float sumHeight;
-        int i,j;
-        do {
-            float[] columnWidth = getColumnWidths(maxWidth);
-            sumHeight = topMargin;
-            float tempEndY = endY - topMargin;
+        int i,j,k;
+        float[] columnWidth = new float[0];
+        for(k=0;k<3;k++) {
+            columnWidth = getColumnWidths(maxWidth);
             for (i = 0; i < table.length; i++) {
                 Component[] row = table[i];
-                if (row.length <= 0) throw new RuntimeException("Cell row is void");
-                float offsetX = 0;
                 for (j = 0; j < row.length; j++) {
-                    boolean isChanged = row[j].build(
-                            startX + offsetX,
-                            tempEndY,
-                            columnWidth[j],
-                            getMinHeightRow(row));
-                    offsetX += columnWidth[j];
-                    if (isChanged) {
-                        break;
-                        /*j = -1;
-                        offsetX = 0;*/
-                    }
+                    row[j].buildMaxWidth(columnWidth[j]);
                 }
-                if (j!=row.length) break;
-                tempEndY -= row[0].getPdRectangle().getHeight();
-                sumHeight += row[0].getPdRectangle().getHeight();
             }
-        }while (i!=table.length);
+            System.out.println(Arrays.toString(columnWidth));
+        }
+        //Aggiusto altezza celle e riallineo
+        float sumHeight = topMargin;
+        float tempEndY = endY - topMargin;
+        for(i=0;i<table.length;i++){
+            Component[] row = table[i];
+            float rowHeight = getMinHeightRow(row);
+            float offsetX = 0;
+            for (j = 0; j < row.length; j++) {
+                row[j].adjust(startX + offsetX,tempEndY,rowHeight,columnWidth[j]);
+                offsetX += columnWidth[j];
+            }
+            tempEndY -= row[0].getPdRectangle().getHeight();
+            sumHeight += row[0].getPdRectangle().getHeight();
+        }
+
         setPdRectangle(new PDRectangle(startX,endY-sumHeight,maxWidth,sumHeight));
         Arrays.stream(table).forEach(x-> Arrays.stream(x).forEach(y-> getComponents().add(y)));
         return sumHeight;

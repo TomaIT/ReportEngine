@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.example.demo.exceptions.OverlappingException;
 import com.example.demo.reportengine.Component;
 import com.example.demo.reportengine.components.UnevenTable;
 import lombok.Data;
@@ -13,7 +14,7 @@ import java.util.List;
 public class UnevenTableJSON {
     private List<Row> rows;
 
-    public UnevenTable build(float startX,float endY,float maxWidth) throws CloneNotSupportedException {
+    public UnevenTable build(float startX,float endY,float maxWidth) throws CloneNotSupportedException, OverlappingException {
 
         Component[][] components = new Component[rows.size()][];
         for(int i=0;i<rows.size();i++){

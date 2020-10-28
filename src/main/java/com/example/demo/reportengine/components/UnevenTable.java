@@ -1,5 +1,6 @@
 package com.example.demo.reportengine.components;
 
+import com.example.demo.exceptions.OverlappingException;
 import com.example.demo.reportengine.Component;
 import lombok.*;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -40,23 +41,27 @@ public class UnevenTable extends Component implements Cloneable {
      * @return height
      */
     @Override
-    public float buildNoMinHeight(float startX, float endY, float maxWidth, float topMargin) throws CloneNotSupportedException {
+    public float buildNoMinHeight(float startX, float endY, float maxWidth, float topMargin) throws CloneNotSupportedException, OverlappingException {
+
         getComponents().clear();
+
+        //Costruisco celle
+        for(int i=0;i<table.length;i++){
+            Component[] row = table[i];
+            float columnWidth = maxWidth / row.length;
+            for (int j = 0; j < row.length; j++) row[j].buildMaxWidth(columnWidth);
+        }
+
+        //Aggiusto altezza celle e riallineo
         float sumHeight = topMargin;
         float tempEndY = endY - topMargin;
         for(int i=0;i<table.length;i++){
             Component[] row = table[i];
-            if (row.length <= 0) throw new RuntimeException("Cell row is void");
             float columnWidth = maxWidth / row.length;
+            float rowHeight = getMinHeightRow(row);
             for (int j = 0; j < row.length; j++) {
-                boolean isChanged = row[j].build(
-                        startX + j * columnWidth,
-                        tempEndY,
-                        columnWidth,
-                        getMinHeightRow(row));
-                if (isChanged) {
-                    j = -1;
-                }
+                row[j].adjust(startX + j * columnWidth,tempEndY,rowHeight,columnWidth);
+
             }
             tempEndY -= row[0].getPdRectangle().getHeight();
             sumHeight += row[0].getPdRectangle().getHeight();
@@ -64,6 +69,7 @@ public class UnevenTable extends Component implements Cloneable {
         setPdRectangle(new PDRectangle(startX,endY-sumHeight,maxWidth,sumHeight));
         Arrays.stream(table).forEach(x-> Arrays.stream(x).forEach(y-> getComponents().add(y)));
         return sumHeight;
+
     }
 
     @Override
