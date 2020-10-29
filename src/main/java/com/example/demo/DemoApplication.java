@@ -13,8 +13,11 @@ import com.example.demo.reportengine.services.FontService;
 import com.example.demo.table.Table;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.fontbox.util.autodetect.FontFileFinder;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,6 +32,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -213,7 +217,10 @@ public class DemoApplication  implements CommandLineRunner {
         //System.out.println("HTML-DONE");
 
         Utility.startTimer("TOTAL");
-        //tryByReportJSON();
+
+        //FontService.loadSystemFonts();
+
+        tryByReportJSON();
         //new PDFTableGenerator().generatePDF(createContent(10,9,12),"src/main/resources/prove/tablePdfBox_"+System.currentTimeMillis()+".pdf");
         //prova();
         Report report = new Report(PDRectangle.A4,50,50,50,50,
@@ -236,8 +243,8 @@ public class DemoApplication  implements CommandLineRunner {
 
         report.build();
 
-
         report.render().save("src/main/resources/prove/components_"+System.currentTimeMillis()+".pdf");
+
 
         //report.getPages().forEach(x->System.out.println(x.getFirstVoidSpace()));
 

@@ -1,6 +1,7 @@
 package com.example.demo.reportengine;
 
 import com.example.demo.exceptions.OverlappingException;
+import com.example.demo.reportengine.services.FontService;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -131,6 +133,7 @@ public class Report {
             componentPage.render(contentStream);
             contentStream.close();
         }
+        FontService.reload();
         return pdDocument;
     }
 
