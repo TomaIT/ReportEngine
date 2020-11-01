@@ -17,12 +17,13 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class TextCell extends Component implements Cloneable {
-    @Setter(AccessLevel.NONE) private static final float minMarginText = 2f;
+    @Setter(AccessLevel.NONE) private static final float minMarginText = 1f;
     @Setter(AccessLevel.NONE) private static final float underlineWidthFactor = 0.03f;
     @Setter(AccessLevel.NONE) private static final float underlineMarginFactor = 0.08f;
     private String value = "";
@@ -67,6 +68,10 @@ public class TextCell extends Component implements Cloneable {
             return (float) getComponents().stream().mapToDouble(Component::getMinWidth).max().orElse(0);
         }
         return textWidth + minMarginText*2;
+    }
+
+    public float getMaxWidthSplitted() {
+        return (float) Arrays.stream(value.split("\\s+")).mapToDouble(x->FontService.getWidth(x,fontType,fontSize)+ minMarginText*2).max().orElse(0);
     }
 
     public float getTextHeight() {
@@ -205,7 +210,8 @@ public class TextCell extends Component implements Cloneable {
 
     private String shortens(String value,float maxWidth,PDFont fontType,float fontSize) { // TODO inefficient performance
         final int nCharsSubstitute = 3;
-        while (FontService.getWidth(value,fontType,fontSize)+ minMarginText*2 > maxWidth) {
+        while (FontService.getWidth(value,fontType,fontSize) + minMarginText*2 > maxWidth) {
+            if (value.length()<nCharsSubstitute) throw new RuntimeException("ERROR impossible cut text");
             value = value.substring(0, value.length() - nCharsSubstitute).replaceFirst(".{"+nCharsSubstitute+"}$", "...");
         }
         return value;

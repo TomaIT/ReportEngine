@@ -188,12 +188,15 @@ public class DemoApplication  implements CommandLineRunner {
 
     private static Component[][] table(int nRow,int nCol,int nChars) {
         Component[][] table = new Component[nRow][nCol];
-        for(int i=0;i<nRow;i++){
+        for(int j=0;j<nCol;j++){
+            table[0][j]=createCell(HorizontalAlign.center,"HEADER-"+j,false);
+        }
+        for(int i=1;i<nRow;i++){
             for(int j=0;j<nCol;j++){
                 table[i][j]=createCell(HorizontalAlign.center,RandomStringUtils.randomAlphabetic(1,nChars),false);
             }
         }
-        table[2][2] = createCell(HorizontalAlign.center,"Ma dai dici che davvero funziona? ullalala",true);
+        table[2][2] = createCell(HorizontalAlign.center,"Ma dai dici che davvero funziona? ullalalaullalalaullalalaullalalaullalalaullalalaullalalaullalalaullalalaullalalaullalalaullalalaullalalaullalalaullalalaullalala",true);
         return table;
     }
 
@@ -237,7 +240,7 @@ public class DemoApplication  implements CommandLineRunner {
         report.setFooter(footer);
 
         report.addContent(new UniformTable(table(10,7,10),Color.CYAN,null));
-        report.addContent(new UniformTable(table(15,4,10),Color.GREEN,null));
+        report.addContent(new UniformTable(table(20,4,10),Color.GREEN,null));
         report.addContent(new UniformTable(table(3,4,10),Color.ORANGE,null));
         report.addContent(new UniformTable(table(15,4,10),Color.GREEN,null));
 

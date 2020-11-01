@@ -85,7 +85,21 @@ public class Report {
                     contentEntered = true;
                     contents.remove(0);
                 } else { // Il componente non ci sta nello spazio dedicato, bisogna applicare split se possibile oppure creiamo nuova pagina, se nella nuova pagina non ci sta crash
-                    //TODO
+                    if (content.isSplittable()) {
+                        Component nextComponent = content.split(voidSpace.getHeight());
+                        if (nextComponent != null) { // Altrimenti non si può splittare con quella height minima, lo mettiamo nella pagina successiva.
+                            //Only debug
+                            if (content.getPdRectangle().getHeight() > height)
+                                throw new RuntimeException("Debug error");
+
+                            page.addComponent(content);
+                            contentEntered = true;
+                            contents.remove(0);
+                            contents.add(0, nextComponent);
+                        }
+                    }
+
+
                     page.setFull(true);
                     //throw new RuntimeException("NOT IMPLEMENTED SPLIT");
                 }

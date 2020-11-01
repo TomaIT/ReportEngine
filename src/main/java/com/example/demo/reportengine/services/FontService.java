@@ -7,6 +7,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class FontService {
+	private static final Logger LOG = LoggerFactory.getLogger(FontService.class);
 	private static final String srcPath = "src/main/resources/fonts/";
 	private static PDDocument fontsContainer = new PDDocument();
 	private static PDDocument fontsContainerOld = null;
@@ -29,16 +32,16 @@ public class FontService {
 
 
 	public static void reload() {
-		try{if(fontsContainerOld!=null)fontsContainerOld.close();}catch (Exception ignored){}
+		try{if(fontsContainerOld!=null)fontsContainerOld.close();}catch (Exception e){LOG.error("",e);}
 		fontsContainerOld = fontsContainer;
 		fontsContainer = new PDDocument();
 		mapFonts.clear();
-		findCache.clear(); // TODO improve performance
+		findCache.clear();
 		for(URI uri : mapFontFileURIs.values()){
 			try {
 				PDFont font = PDType0Font.load(fontsContainer, new File(uri));
 				mapFonts.put(font.getName(), font);
-			}catch (Exception ignored){}
+			}catch (Exception e){LOG.error("",e);}
 		}
 	}
 
@@ -75,7 +78,7 @@ public class FontService {
 	private static Map<String,URI> loadAllFonts(Map<String,PDFont> mapFontsIn,Map<String,Integer> distancesIn, String srcPathIn, PDDocument fontsContainerIn){
 		Map<String,URI> result = new HashMap<>();
 		try{
-			FontFileFinder fontFinder = new FontFileFinder();
+			/*FontFileFinder fontFinder = new FontFileFinder();
 			List<URI> fontURIs = fontFinder.find();
 			for (URI uri : fontURIs) {
 				try {
@@ -85,9 +88,9 @@ public class FontService {
 					mapFontsIn.put(font.getName(),font);
 					distancesIn.put(font.getName(),0);
 				}catch (Exception ignored){}
-			}
+			}*/
 			loadLocalFonts(result,mapFontsIn,distancesIn,srcPathIn,fontsContainerIn);
-		}catch (Exception ignored){}
+		}catch (Exception e){LOG.error("",e);}
 		return result;
 	}
 
@@ -96,17 +99,17 @@ public class FontService {
 		File directory = new File(directoryPathSrc);
 		for (File file : Objects.requireNonNull(directory.listFiles())) {
 			if (file.isDirectory()) {
-				try { loadLocalFonts(mapFontFileURIsIn,mapFontsIn,distancesIn,file.getAbsolutePath(),pdDocument); }catch (Exception ignored){}
+				try { loadLocalFonts(mapFontFileURIsIn,mapFontsIn,distancesIn,file.getAbsolutePath(),pdDocument); }catch (Exception e){LOG.error("",e);}
 				continue;
 			}
 			if (file.isFile()) {
 				if(file.toString().endsWith(".ttf")) {
 					try {
 						PDFont font = PDType0Font.load(pdDocument, file);
-						mapFontFileURIsIn.put(font.getName(),new URI(file.getAbsolutePath()));
+						mapFontFileURIsIn.put(font.getName(),file.toURI());
 						mapFontsIn.put(font.getName(), font);
 						distancesIn.put(font.getName(), 0);
-					} catch (Exception ignored) { }
+					}catch (Exception e){LOG.error("",e);}
 				}
 			}
 		}
