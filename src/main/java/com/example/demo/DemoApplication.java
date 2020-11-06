@@ -192,7 +192,8 @@ public class DemoApplication  implements CommandLineRunner {
             table[0][j]=createCell(HorizontalAlign.center,"HEADER-"+j,false);
         }
         for(int i=1;i<nRow;i++){
-            for(int j=0;j<nCol;j++){
+            table[i][0]=createCell(HorizontalAlign.center,String.valueOf(i),false);
+            for(int j=1;j<nCol;j++){
                 table[i][j]=createCell(HorizontalAlign.center,RandomStringUtils.randomAlphabetic(1,nChars),false);
             }
         }
